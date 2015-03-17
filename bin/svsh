@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Process supervision shell for Perp and S6
+
+use lib 'lib';
+use warnings;
+use strict;
+
+use Carp;
+use Getopt::Compact;
+use Svsh::Perp;
+use Term::ShellUI;
+use Try::Tiny;
+
+my $go = Getopt::Compact->new(
+	name => 'svsh',
+	args => 'basedir',
+	modes => ['perp', 's6']
+);
+my $opts = $go->opts;
+
+my $basedir = _check_basedir();
+
+my $svsh = Svsh::Perp->new(basedir => $basedir);
+
+my $term = Term::ShellUI->new(
+	commands => {
+		status => {
+			desc => 'Lists all running processes',
+			method => sub { print $svsh->status }
+		},
+		start => {
+			desc => 'Starts process',
+			minargs => 1,
+			method => sub { print $svsh->start(@_) }
+		},
+		stop => {
+			desc => 'Stops a running process',
+			minargs => 1,
+			method => sub { print $svsh->stop(@_) }
+		},
+		enable => {
+			desc => 'Start a process and enable auto-starting of it',
+			minargs => 1,
+			method => sub { print $svsh->enable(@_) }
+		},
+		disable => {
+			desc => 'Stops a process and disables auto-starting of it',
+			minargs => 1,
+			method => sub { print $svsh->disable(@_) }
+		},
+		fg => {
+			desc => 'Move a process to the foreground',
+			minargs => 1,
+			maxargs => 1,
+			method => sub { $svsh->fg(@_) }
+		},
+		quit => {
+			desc => 'Quit this program',
+			maxargs => 0,
+			method => sub { shift->exit_requested(1) }
+		},
+		exit => { alias => 'quit' }
+	},
+	prompt => 'svsh> '
+);
+$term->process_a_cmd('status');
+$term->run();
+
+sub _check_basedir {
+	try {
+		my $basedir = $ARGV[0]
+			|| die "Base directory not provided";
+		-e $basedir && -d $basedir
+			|| die "Base directory does not exist or is not a directory";
+
+		return $basedir;
+	} catch {
+		print "ERROR: $_\n", $go->usage;
+		exit 1;
+	};
+}
