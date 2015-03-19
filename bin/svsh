@@ -61,6 +61,11 @@ my $term = Term::ShellUI->new(
 			maxargs => 1,
 			method => sub { $svsh->fg(@_) }
 		},
+		terminate => {
+			desc => 'Shut down the process supervisor (all processes will terminate)',
+			method => sub { $svsh->terminate(); shift->process_a_cmd('quit'); }
+		},
+		shutdown => { alias => 'terminate' },
 		quit => {
 			desc => 'Quit this program',
 			maxargs => 0,

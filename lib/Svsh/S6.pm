@@ -29,6 +29,10 @@ sub disable {
 	return "disable is not supported on s6";
 }
 
+sub terminate {
+	$_[0]->run_cmd('s6-svscanctl', '-7', $_[0]->basedir);
+}
+
 sub fg {
 	my $logfile = $_[0]->find_out_log_file($_[2]->{args}->[0])
 		|| return "Can't find out process' log file";

@@ -24,7 +24,11 @@ sub enable {
 }
 
 sub disable {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
+	$_[0]->run_cmd('perpc', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
+}
+
+sub terminate {
+	$_[0]->run_cmd('perphup', '-t', $_[0]->basedir);
 }
 
 sub fg {
