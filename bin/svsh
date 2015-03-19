@@ -8,7 +8,6 @@ use strict;
 
 use Carp;
 use Getopt::Compact;
-use Svsh::Perp;
 use Term::ShellUI;
 use Try::Tiny;
 
@@ -19,9 +18,16 @@ my $go = Getopt::Compact->new(
 );
 my $opts = $go->opts;
 
+my $class = 'Svsh::' . ( $opts->{perp} ? 'Perp' : 'S6');
+
+eval "require $class";
+
+confess $@
+	if $@;
+
 my $basedir = _check_basedir();
 
-my $svsh = Svsh::Perp->new(basedir => $basedir);
+my $svsh = $class->new(basedir => $basedir);
 
 my $term = Term::ShellUI->new(
 	commands => {

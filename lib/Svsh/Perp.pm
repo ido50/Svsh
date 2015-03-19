@@ -37,8 +37,8 @@ sub fg {
 sub find_out_log_file {
 	my ($self, $process) = @_;
 
-	open(RCLOG, '<', $self->basedir.'/'.$process.'/rc.log');
-	while (<RCLOG>) {
+	open(my $fh, '<', $self->basedir.'/'.$process.'/rc.log');
+	while (<$fh>) {
 		chomp;
 		if (m!tinylog[^/]+(/[^\s]+)!) {
 			my $dir = $1;
@@ -46,7 +46,7 @@ sub find_out_log_file {
 			return $dir.'/current';
 		}
 	}
-	close RCLOG;
+	close $fh;
 
 	return;
 }
