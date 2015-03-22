@@ -29,6 +29,19 @@ sub disable {
 	return "disable is not supported on s6";
 }
 
+sub signal {
+	my ($sign, @sv) = @{$_[2]->{args}};
+
+	return "s6 can only signal one process at a time"
+		if scalar @sv > 1;
+
+	# convert signal to perpctl command
+	$sign =~ s/^sig//i;
+	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
+
+	$_[0]->run_cmd('s6-svc', "-$cmd", $_[0]->basedir.'/'.$sv[0]);
+}
+
 sub terminate {
 	$_[0]->run_cmd('s6-svscanctl', '-7', $_[0]->basedir);
 }

@@ -27,6 +27,16 @@ sub disable {
 	$_[0]->run_cmd('perpc', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
 }
 
+sub signal {
+	my ($sign, @sv) = @{$_[2]->{args}};
+
+	# convert signal to perpctl command
+	$sign =~ s/^sig//i;
+	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
+
+	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, $cmd, @sv);
+}
+
 sub terminate {
 	$_[0]->run_cmd('perphup', '-t', $_[0]->basedir);
 }

@@ -12,7 +12,7 @@ has 'basedir' => (
 	required => 1
 );
 
-requires qw/status start stop enable disable fg/;
+requires qw/status start stop enable disable signal fg/;
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
