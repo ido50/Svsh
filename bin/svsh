@@ -14,51 +14,56 @@ use Try::Tiny;
 my $go = Getopt::Compact->new(
 	name => 'svsh',
 	args => 'basedir',
-	modes => ['perp', 's6']
+	modes => ['perp', 's6'],
+	struct => [
+		[['b', 'bindir'], 'directory where the supervisor is installed (e.g. /usr/sbin)', ':s']
+	]
 );
 my $opts = $go->opts;
 
-my $class = 'Svsh::' . ( $opts->{perp} ? 'Perp' : 'S6');
+my $class = 'Svsh::' . ( delete $opts->{perp} ? 'Perp' :
+				 delete $opts->{s6}   ? 'S6'   :
+				 confess 'What supervisor are you using?' );
 
 eval "require $class";
 
 confess $@
 	if $@;
 
-my $basedir = _check_basedir();
+$opts->{basedir} = _check_basedir();
 
-my $svsh = $class->new(basedir => $basedir);
+my $svsh = $class->new(%$opts);
 
 my $term = Term::ShellUI->new(
 	commands => {
 		status => {
 			desc => 'Lists all running processes',
-			method => sub { print $svsh->status }
+			method => sub { $svsh->status }
 		},
 		start => {
 			desc => 'Starts process',
 			minargs => 1,
-			method => sub { print $svsh->start(@_) }
+			method => sub { $svsh->start(@_) }
 		},
 		stop => {
 			desc => 'Stops a running process',
 			minargs => 1,
-			method => sub { print $svsh->stop(@_) }
+			method => sub { $svsh->stop(@_) }
 		},
 		enable => {
 			desc => 'Start a process and enable auto-starting of it',
 			minargs => 1,
-			method => sub { print $svsh->enable(@_) }
+			method => sub { $svsh->enable(@_) }
 		},
 		disable => {
 			desc => 'Stops a process and disables auto-starting of it',
 			minargs => 1,
-			method => sub { print $svsh->disable(@_) }
+			method => sub { $svsh->disable(@_) }
 		},
 		signal => {
 			desc => 'Sends a signal to a process (or processes)',
 			minargs => 1,
-			method => sub { print $svsh->signal(@_) }
+			method => sub { $svsh->signal(@_) }
 		},
 		fg => {
 			desc => 'Move a process to the foreground',

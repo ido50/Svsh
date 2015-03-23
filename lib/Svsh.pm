@@ -12,12 +12,18 @@ has 'basedir' => (
 	required => 1
 );
 
+has 'bindir' => (
+	is => 'ro'
+);
+
 requires qw/status start stop enable disable signal fg/;
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
 
 	#print "Running command: ", join(' ', $cmd, @args), "\n";
+	$cmd = $self->bindir . '/' . $cmd
+		if $self->bindir;
 
 	system($cmd, @args);
 }
