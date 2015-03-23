@@ -13,9 +13,9 @@ use Try::Tiny;
 
 my $go = Getopt::Compact->new(
 	name => 'svsh',
-	args => 'basedir',
 	modes => ['perp', 's6'],
 	struct => [
+		[['d', 'basedir'], 'service directory (directory on which the supervisor was started)', '=s'],
 		[['b', 'bindir'], 'directory where the supervisor is installed (e.g. /usr/sbin)', ':s']
 	]
 );
@@ -30,7 +30,7 @@ eval "require $class";
 confess $@
 	if $@;
 
-$opts->{basedir} = _check_basedir();
+_check_basedir($opts->{basedir});
 
 my $svsh = $class->new(%$opts);
 
@@ -95,13 +95,14 @@ my $term = Term::ShellUI->new(
 	},
 	prompt => 'svsh> '
 );
-$term->process_a_cmd('status');
-$term->run();
+$term->process_a_cmd('status')
+	unless scalar @ARGV;
+$term->run(@ARGV);
 
 sub _check_basedir {
+	my $basedir = shift;
 	try {
-		my $basedir = $ARGV[0]
-			|| die "Base directory not provided";
+		$basedir || die "Base directory not provided";
 		-e $basedir && -d $basedir
 			|| die "Base directory does not exist or is not a directory";
 
