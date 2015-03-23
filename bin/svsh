@@ -41,7 +41,7 @@ my $term = Term::ShellUI->new(
 			method => sub { $svsh->status }
 		},
 		start => {
-			desc => 'Starts process',
+			desc => 'Starts process(es)',
 			minargs => 1,
 			method => sub { $svsh->start(@_) }
 		},
@@ -49,6 +49,11 @@ my $term = Term::ShellUI->new(
 			desc => 'Stops a running process',
 			minargs => 1,
 			method => sub { $svsh->stop(@_) }
+		},
+		restart => {
+			desc => 'Stops and start a process or processes',
+			minargs => 1,
+			method => sub { $svsh->restart(@_) }
 		},
 		enable => {
 			desc => 'Start a process and enable auto-starting of it',
@@ -65,6 +70,11 @@ my $term = Term::ShellUI->new(
 			minargs => 1,
 			method => sub { $svsh->signal(@_) }
 		},
+		rescan => {
+			desc => 'Rescans the service directory to look for new/removed services',
+			method => sub { $svsh->rescan }
+		},
+		update => { alias => 'rescan' },
 		fg => {
 			desc => 'Move a process to the foreground',
 			minargs => 1,

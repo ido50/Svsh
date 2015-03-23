@@ -16,12 +16,11 @@ has 'bindir' => (
 	is => 'ro'
 );
 
-requires qw/status start stop enable disable signal fg/;
+requires qw/status start stop restart enable disable signal rescan terminate fg/;
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
 
-	#print "Running command: ", join(' ', $cmd, @args), "\n";
 	$cmd = $self->bindir . '/' . $cmd
 		if $self->bindir;
 

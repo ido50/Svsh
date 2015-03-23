@@ -21,6 +21,15 @@ sub stop {
 	$_[0]->run_cmd('s6-svc', '-Dd', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
 }
 
+sub restart {
+	my @sv = @{$_[2]->{args}};
+
+	return "s6 can only signal one process at a time"
+		if scalar @sv > 1;
+
+	$_[0]->run_cmd('s6-svc', '-q', $_[0]->basedir.'/'.$sv[0]);
+}
+
 sub enable {
 	return "enable is not supported on s6";
 }
@@ -40,6 +49,10 @@ sub signal {
 	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
 
 	$_[0]->run_cmd('s6-svc', "-$cmd", $_[0]->basedir.'/'.$sv[0]);
+}
+
+sub rescan {
+	$_[0]->run_cmd('s6-svscanctl', '-a', $_[0]->basedir);
 }
 
 sub terminate {

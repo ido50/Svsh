@@ -19,6 +19,10 @@ sub stop {
 	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'D', @{$_[2]->{args}});
 }
 
+sub restart {
+	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'q', @{$_[2]->{args}});
+}
+
 sub enable {
 	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'A', @{$_[2]->{args}});
 }
@@ -35,6 +39,10 @@ sub signal {
 	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
 
 	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, $cmd, @sv);
+}
+
+sub rescan {
+	$_[0]->run_cmd('perphup', $_[0]->basedir);
 }
 
 sub terminate {
