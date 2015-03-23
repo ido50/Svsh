@@ -17,7 +17,7 @@ requires qw/status start stop enable disable signal fg/;
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
 
-	print "Running command: ", join(' ', $cmd, @args), "\n";
+	#print "Running command: ", join(' ', $cmd, @args), "\n";
 
 	system($cmd, @args);
 }
