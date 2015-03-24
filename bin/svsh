@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+BEGIN {
+	binmode STDOUT, ':encoding(utf8)';
+}
+
 # ABSTRACT: Process supervision shell for Perp and S6
 
 use lib 'lib';
@@ -86,6 +90,11 @@ my $term = Term::ShellUI->new(
 			method => sub { $svsh->terminate(); shift->process_a_cmd('quit'); }
 		},
 		shutdown => { alias => 'terminate' },
+		help => {
+			desc => 'Print helpful information',
+			args => sub { shift->help_args(undef, @_); },
+			method => sub { shift->help_call(undef, @_); }
+		},
 		quit => {
 			desc => 'Quit this program',
 			maxargs => 0,
