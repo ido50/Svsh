@@ -22,7 +22,7 @@ sub run_cmd {
 	my ($self, $cmd, @args) = @_;
 
 	$cmd = $self->bindir . '/' . $cmd
-		if $self->bindir;
+		if $self->bindir && $cmd =~ m/^(perp|s6)/;
 
 	system($cmd, @args);
 }
