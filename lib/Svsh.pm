@@ -21,12 +21,21 @@ requires qw/status start stop restart enable disable signal rescan terminate fg/
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
 
+	my $options = {};
+
 	$cmd = $self->bindir . '/' . $cmd
 		if $self->bindir && $cmd =~ m/^(perp|s6)/;
 
-	$cmd = join(' ', $cmd, @args);
+	if (scalar @args && ref $args[-1]) {
+		$options = pop @args;
+	}
 
-	return qx/$cmd 2>&1/;
+	if ($options->{as_system}) {
+		system($cmd, @args);
+	} else {
+		$cmd = join(' ', $cmd, @args);
+		return qx/$cmd 2>&1/;
+	}
 }
 
 1;

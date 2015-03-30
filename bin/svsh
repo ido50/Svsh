@@ -42,7 +42,7 @@ my $svsh = $class->new(%$opts);
 my $term = Term::ShellUI->new(
 	commands => {
 		status => {
-			desc => 'Lists all running processes',
+			desc => 'Lists all processes',
 			method => sub {
 				my $statuses = $svsh->status(@_);
 				print BOLD BLACK ON_WHITE
@@ -62,7 +62,8 @@ my $term = Term::ShellUI->new(
 						sprintf('%5s', $s->{pid}), " \n";
 				}
 				print "\n";
-			}
+			},
+			doc => "\nUsage: status\n\nLists all services in the service directory and their statuses, including uptime (or downtime) and PIDs.\n\nIn Perp, status can be 'up', 'down' (an expected down, such as the process being manually stopped),\n'resetting', 'disabled' or 'backoff' (meaning the process should be up, but fails to load).\n\nIn S6, only 'up' and 'down' are provided.\n"
 		},
 		start => {
 			desc => 'Starts process(es)',

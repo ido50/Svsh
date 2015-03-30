@@ -13,31 +13,33 @@ sub status {
 		chomp;
 		my @m = m/^
 			\[
-				.\s		# the perpd status
-				(.)(.)(.)\s	# the process status
-				...		# the logger status
+				.\s			# the perpd status
+				(.)(.)(.)\s		# the process status
+				...			# the logger status
 			\]\s+
-			(\S+)\s+		# the process name
-			uptime:\s+
-			([^\/]+)s		# the process uptime
-			\/
-			\S+s			# the logger uptime
-			\s+
-			pids:\s+
-			([^\/]+)		# the process pid
-			\/
-			\S+			# the logger pid
+			(\S+)\s+			# the process name
+			(?:
+				uptime:\s+
+				([^\/]+)s		# the process uptime
+				\/
+				\S+s			# the logger uptime
+				\s+
+				pids:\s+
+				([^\/]+)		# the process pid
+				\/
+				\S+			# the logger pid
+			)?				# optional because inactive services will not have this
 		/x;
 
+		my $status = $m[0] eq '+' ? $m[2] eq 'r' ? 'resetting' : 'up' :
+				 $m[0] eq '.' ? 'down' :
+				 $m[0] eq '!' ? 'backoff' :
+				 $m[0] eq '-' ? 'disabled' : 'unknown';
+
 		$statuses->{$m[3]} = {
-			status =>	$m[0] eq '+' ?
-						$m[2] eq 'r' ?	'resetting' :
-									'up' :
-					$m[0] eq '.' ? 'down' :
-					$m[0] eq '!' ? 'backoff' :
-					$m[0] eq '-' ? 'disabled' : 'unknown',
-			pid => $m[5],
-			duration => $m[4] eq '-' ? 0 : int($m[4])
+			status => $status,
+			pid => $status eq 'up' ? $m[5] : '-',
+			duration => $status eq 'up' ? $m[4] eq '-' ? 0 : int($m[4]) : 0
 		};
 	}
 
@@ -86,7 +88,7 @@ sub fg {
 	my $logfile = $_[0]->find_out_log_file($_[2]->{args}->[0])
 		|| return "Can't find out process' log file";
 
-	$_[0]->run_cmd('tail', '-f', $logfile);
+	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
 }
 
 sub find_out_log_file {

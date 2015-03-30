@@ -75,7 +75,7 @@ sub fg {
 	my $logfile = $_[0]->find_out_log_file($_[2]->{args}->[0])
 		|| return "Can't find out process' log file";
 
-	$_[0]->run_cmd('tail', '-f', $logfile);
+	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
 }
 
 sub find_out_log_file {
