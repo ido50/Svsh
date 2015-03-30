@@ -8,6 +8,7 @@ use strict;
 
 use Carp;
 use Getopt::Compact;
+use Term::ANSIColor qw/:constants/;
 use Term::ShellUI;
 use Try::Tiny;
 
@@ -38,41 +39,60 @@ my $term = Term::ShellUI->new(
 	commands => {
 		status => {
 			desc => 'Lists all running processes',
-			method => sub { $svsh->status }
+			method => sub {
+				my $statuses = $svsh->status(@_);
+				print BOLD BLACK ON_WHITE
+					join(' | ',
+						sprintf('%16s', 'process'),
+						sprintf('%10s',  'status'),
+						sprintf('%8s', 'duration'),
+						sprintf('%5s',      'pid')
+					), ' ', RESET, "\n";
+				foreach (sort keys %$statuses) {
+					my $s = $statuses->{$_};
+					my $color = $s->{status} eq 'up' ? GREEN :
+							$s->{status} eq 'resetting' ? YELLOW : RED;
+					print BOLD sprintf('%16s', $_), RESET, ' | ',
+						$color, sprintf('%10s', $s->{status}), RESET, ' | ',
+						sprintf('%8s', $s->{duration}.'s'), ' | ',
+						sprintf('%5s', $s->{pid}), " \n";
+				}
+				print "\n";
+			}
 		},
 		start => {
 			desc => 'Starts process(es)',
 			minargs => 1,
-			method => sub { $svsh->start(@_) }
+			method => sub { print $svsh->start(@_) }
 		},
 		stop => {
 			desc => 'Stops a running process',
 			minargs => 1,
-			method => sub { $svsh->stop(@_) }
+			method => sub { print $svsh->stop(@_) }
 		},
 		restart => {
 			desc => 'Stops and start a process or processes',
 			minargs => 1,
-			method => sub { $svsh->restart(@_) }
+			method => sub { print $svsh->restart(@_) }
 		},
 		enable => {
 			desc => 'Start a process and enable auto-starting of it',
 			minargs => 1,
-			method => sub { $svsh->enable(@_) }
+			method => sub { print $svsh->enable(@_) }
 		},
 		disable => {
 			desc => 'Stops a process and disables auto-starting of it',
 			minargs => 1,
-			method => sub { $svsh->disable(@_) }
+			method => sub { print $svsh->disable(@_) }
 		},
 		signal => {
 			desc => 'Sends a signal to a process (or processes)',
 			minargs => 1,
-			method => sub { $svsh->signal(@_) }
+			method => sub { print $svsh->signal(@_) }
 		},
 		rescan => {
 			desc => 'Rescans the service directory to look for new/removed services',
-			method => sub { $svsh->rescan }
+			method => sub { print $svsh->rescan }
 		},
 		update => { alias => 'rescan' },
 		fg => {

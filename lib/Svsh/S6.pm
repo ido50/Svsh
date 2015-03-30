@@ -8,9 +8,21 @@ use namespace::clean;
 with 'Svsh';
 
 sub status {
+	my $statuses = {};
 	foreach ($_[0]->service_dirs) {
-		$_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_);
+		my $raw = $_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_);
+		my ($status, $comment, $seconds) = ($raw =~ m/(up|down) \(([^\)]+)\) (\d+)/);
+		$statuses->{$_} = {
+			status => $status,
+			duration => $seconds,
+			pid => '-'
+		};
+
+		if ($comment =~ m/pid (\d+)/) {
+			$statuses->{$_}->{pid} = $1;
+		}
 	}
+	return $statuses;
 }
 
 sub start {

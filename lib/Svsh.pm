@@ -24,7 +24,9 @@ sub run_cmd {
 	$cmd = $self->bindir . '/' . $cmd
 		if $self->bindir;
 
-	system($cmd, @args);
+	$cmd = join(' ', $cmd, @args);
+
+	return qx/$cmd 2>&1/;
 }
 
 1;

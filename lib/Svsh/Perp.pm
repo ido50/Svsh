@@ -8,7 +8,40 @@ use namespace::clean;
 with 'Svsh';
 
 sub status {
-	$_[0]->run_cmd('perpls', '-b', $_[0]->basedir, '-g');
+	my $statuses = {};
+	foreach ($_[0]->run_cmd('perpls', '-b', $_[0]->basedir, '-g')) {
+		chomp;
+		my @m = m/^
+			\[
+				.\s		# the perpd status
+				(.)(.)(.)\s	# the process status
+				...		# the logger status
+			\]\s+
+			(\S+)\s+		# the process name
+			uptime:\s+
+			([^\/]+)s		# the process uptime
+			\/
+			\S+s			# the logger uptime
+			\s+
+			pids:\s+
+			([^\/]+)		# the process pid
+			\/
+			\S+			# the logger pid
+		/x;
+
+		$statuses->{$m[3]} = {
+			status =>	$m[0] eq '+' ?
+						$m[2] eq 'r' ?	'resetting' :
+									'up' :
+					$m[0] eq '.' ? 'down' :
+					$m[0] eq '!' ? 'backoff' :
+					$m[0] eq '-' ? 'disabled' : 'unknown',
+			pid => $m[5],
+			duration => $m[4] eq '-' ? 0 : int($m[4])
+		};
+	}
+
+	return $statuses;
 }
 
 sub start {
