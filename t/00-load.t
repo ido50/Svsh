@@ -3,7 +3,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-	use_ok('Pye') || print "Bail out!\n";
+	use_ok('Svsh') || print "Bail out!\n";
 }
 
-diag("Testing Pye $Pye::VERSION, Perl $], $^X");
+diag("Testing Svsh $Svsh::VERSION, Perl $], $^X");
