@@ -16,7 +16,7 @@ has 'bindir' => (
 	is => 'ro'
 );
 
-requires qw/status start stop restart enable disable signal rescan terminate fg/;
+requires qw/status start stop restart signal rescan terminate fg/;
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;

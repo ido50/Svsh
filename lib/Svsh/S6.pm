@@ -42,14 +42,6 @@ sub restart {
 	$_[0]->run_cmd('s6-svc', '-q', $_[0]->basedir.'/'.$sv[0]);
 }
 
-sub enable {
-	return "enable is not supported on s6";
-}
-
-sub disable {
-	return "disable is not supported on s6";
-}
-
 sub signal {
 	my ($sign, @sv) = @{$_[2]->{args}};
 

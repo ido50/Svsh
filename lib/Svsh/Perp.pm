@@ -47,23 +47,15 @@ sub status {
 }
 
 sub start {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'U', @{$_[2]->{args}});
+	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'A', @{$_[2]->{args}});
 }
 
 sub stop {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'D', @{$_[2]->{args}});
+	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
 }
 
 sub restart {
 	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'q', @{$_[2]->{args}});
-}
-
-sub enable {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'A', @{$_[2]->{args}});
-}
-
-sub disable {
-	$_[0]->run_cmd('perpc', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
 }
 
 sub signal {

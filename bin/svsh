@@ -80,16 +80,6 @@ my $term = Term::ShellUI->new(
 			minargs => 1,
 			method => sub { print $svsh->restart(@_) }
 		},
-		enable => {
-			desc => 'Start a process and enable auto-starting of it',
-			minargs => 1,
-			method => sub { print $svsh->enable(@_) }
-		},
-		disable => {
-			desc => 'Stops a process and disables auto-starting of it',
-			minargs => 1,
-			method => sub { print $svsh->disable(@_) }
-		},
 		signal => {
 			desc => 'Sends a signal to a process (or processes)',
 			minargs => 1,
