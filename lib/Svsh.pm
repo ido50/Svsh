@@ -16,7 +16,35 @@ has 'bindir' => (
 	is => 'ro'
 );
 
+has 'statuses' => (
+	is => 'ro',
+	writer => '_set_statuses'
+);
+
 requires qw/status start stop restart signal rescan terminate fg logfile/;
+
+before [qw/start stop restart/] => sub {
+	my %services;
+	foreach (@{$_[2]->{args}}) {
+		if (m/\*/) {
+			# this is a wildcard, find all services that match it
+			my $regex = $_; $regex =~ s/\*/.*/; $regex = qr/^$regex$/;
+			foreach my $sv (grep { m/$regex/ } keys %{$_[0]->statuses}) {
+				$services{$sv} = 1;
+			}
+		} else {
+			$services{$_} = 1;
+		}
+	}
+
+	$_[2]->{args} = [keys %services];
+};
+
+around 'status' => sub {
+	my ($orig, $self) = (shift, shift);
+	$self->_set_statuses($orig->($self, @_));
+	return $self->statuses;
+};
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;

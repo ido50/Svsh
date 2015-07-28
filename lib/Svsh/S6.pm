@@ -28,33 +28,33 @@ sub status {
 }
 
 sub start {
-	$_[0]->run_cmd('s6-svc', '-u', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+	foreach (@{$_[2]->{args}}) {
+		$_[0]->run_cmd('s6-svc', '-u', map { $_[0]->basedir.'/'.$_ } $_);
+	}
 }
 
 sub stop {
-	$_[0]->run_cmd('s6-svc', '-Dd', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+	foreach (@{$_[2]->{args}}) {
+		$_[0]->run_cmd('s6-svc', '-Dd', map { $_[0]->basedir.'/'.$_ } $_);
+	}
 }
 
 sub restart {
-	my @sv = @{$_[2]->{args}};
-
-	return "s6 can only signal one process at a time"
-		if scalar @sv > 1;
-
-	$_[0]->run_cmd('s6-svc', '-q', $_[0]->basedir.'/'.$sv[0]);
+	foreach (@{$_[2]->{args}}) {
+		$_[0]->run_cmd('s6-svc', '-q', $_[0]->basedir.'/'.$_);
+	}
 }
 
 sub signal {
 	my ($sign, @sv) = @{$_[2]->{args}};
 
-	return "s6 can only signal one process at a time"
-		if scalar @sv > 1;
-
 	# convert signal to perpctl command
 	$sign =~ s/^sig//i;
 	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
 
-	$_[0]->run_cmd('s6-svc', "-$cmd", $_[0]->basedir.'/'.$sv[0]);
+	foreach (@sv) {
+		$_[0]->run_cmd('s6-svc', "-$cmd", $_[0]->basedir.'/'.$_);
+	}
 }
 
 sub rescan {
