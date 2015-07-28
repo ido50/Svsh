@@ -5,6 +5,8 @@ use autodie;
 use Moo;
 use namespace::clean;
 
+has 'logfile' => (is => 'ro', default => '');
+
 with 'Svsh';
 
 sub status {
@@ -64,8 +66,14 @@ sub terminate {
 }
 
 sub fg {
-	my $logfile = $_[0]->find_out_log_file($_[2]->{args}->[0])
-		|| return "Can't find out process' log file";
+	# find out the pid of the logging process
+	my $text = $_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_[2]->{args}->[0].'/log');
+	my $pid = ($text =~ m/\(pid (\d+)\)/)[0]
+		|| die "Can't figure out pid of the logging process";
+
+	# find out the current log file
+	my $logfile = $_[0]->find_logfile($pid)
+		|| die "Can't find out process' log file";
 
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
 }

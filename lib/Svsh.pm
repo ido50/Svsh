@@ -16,7 +16,7 @@ has 'bindir' => (
 	is => 'ro'
 );
 
-requires qw/status start stop restart signal rescan terminate fg/;
+requires qw/status start stop restart signal rescan terminate fg logfile/;
 
 sub run_cmd {
 	my ($self, $cmd, @args) = @_;
@@ -36,6 +36,22 @@ sub run_cmd {
 		$cmd = join(' ', $cmd, @args);
 		return qx/$cmd 2>&1/;
 	}
+}
+
+sub find_logfile {
+	my ($self, $pid) = @_;
+
+	my $exe = readlink("/proc/$pid/exe");
+
+	return unless $exe;
+
+	my $fd =	$exe =~ m/tinylog/ ? 4 :
+			$exe =~ m/s6-log/ ? 3 :
+			$exe =~ m/svlogd/ ? 6 : 0;
+
+	return unless $fd;
+
+	return readlink("/proc/$pid/fd/$fd").$self->logfile;
 }
 
 1;
