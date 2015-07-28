@@ -21,7 +21,8 @@ my $go = Getopt::Compact->new(
 	modes => ['perp', 's6'],
 	struct => [
 		[['d', 'basedir'], 'service directory (directory on which the supervisor was started)', '=s'],
-		[['b', 'bindir'], 'directory where the supervisor is installed (e.g. /usr/sbin)', ':s']
+		[['b', 'bindir'], 'directory where the supervisor is installed (e.g. /usr/sbin)', ':s'],
+		[['c', 'collapse'], 'collapse numbered services into one line']
 	]
 );
 my $opts = $go->opts;
@@ -44,7 +45,28 @@ my $term = Term::ShellUI->new(
 		status => {
 			desc => 'Lists all processes',
 			method => sub {
-				my $statuses = $svsh->status(@_);
+				my %statuses = %{$svsh->status(@_)};
+
+				if ($svsh->collapse) {
+					my $collapsed = {};
+					foreach my $sv (keys %statuses) {
+						next unless $sv =~ m/-\d+$/;
+						$collapsed->{$`} ||= [];
+						push(@{$collapsed->{$`}}, delete $statuses{$sv});
+					}
+					foreach my $sv (keys %$collapsed) {
+						my $status_counters = {};
+						foreach my $proc (@{$collapsed->{$sv}}) {
+							$status_counters->{$proc->{status}} += 1;
+						}
+						$statuses{$sv} = {
+							status => join(', ', map($status_counters->{$_}.' '.$_, sort(keys(%$status_counters)))),
+							pid => '-',
+							duration => 0
+						};
+					}
+				}
+
 				print BOLD BLACK ON_WHITE
 					join(' | ',
 						sprintf('%16s', 'process'),
@@ -52,9 +74,9 @@ my $term = Term::ShellUI->new(
 						sprintf('%8s', 'duration'),
 						sprintf('%5s',      'pid')
 					), ' ', RESET, "\n";
-				foreach (sort keys %$statuses) {
-					my $s = $statuses->{$_};
-					my $color = $s->{status} eq 'up' ? GREEN :
+				foreach (sort keys %statuses) {
+					my $s = $statuses{$_};
+					my $color = $s->{status} =~ m/^(\d+ )?up$/ ? GREEN :
 							$s->{status} eq 'resetting' ? YELLOW : RED;
 					print BOLD sprintf('%16s', $_), RESET, ' | ',
 						$color, sprintf('%10s', $s->{status}), RESET, ' | ',
@@ -64,6 +86,18 @@ my $term = Term::ShellUI->new(
 				print "\n";
 			},
 			doc => "\nUsage: status\n\nLists all services in the service directory and their statuses, including uptime (or downtime) and PIDs.\n\nIn Perp, status can be 'up', 'down' (an expected down, such as the process being manually stopped),\n'resetting', 'disabled' or 'backoff' (meaning the process should be up, but fails to load).\n\nIn S6, only 'up' and 'down' are provided.\n"
+		},
+		toggle => {
+			desc => 'Toggle svsh switches (e.g. collapse)',
+			minargs => 1,
+			maxargs => 1,
+			method => sub {
+				foreach (@{$_[1]->{args}}) {
+					next unless $svsh->can($_);
+					$svsh->$_($svsh->$_ ? 0 : 1);
+				}
+				$_[0]->process_a_cmd('status');
+			}
 		},
 		start => {
 			desc => 'Starts process(es)',

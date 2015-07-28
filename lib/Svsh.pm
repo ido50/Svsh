@@ -16,6 +16,11 @@ has 'bindir' => (
 	is => 'ro'
 );
 
+has 'collapse' => (
+	is => 'rw',
+	default => sub { 0 }
+);
+
 has 'statuses' => (
 	is => 'ro',
 	writer => '_set_statuses'
