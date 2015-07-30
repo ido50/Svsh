@@ -5,8 +5,6 @@ use autodie;
 use Moo;
 use namespace::clean;
 
-has 'logfile' => (is => 'ro', default => '');
-
 with 'Svsh';
 
 sub status {
@@ -76,21 +74,6 @@ sub fg {
 		|| die "Can't find out process' log file";
 
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
-}
-
-sub find_out_log_file {
-	my ($self, $process) = @_;
-
-	open(my $fh, '<', $self->basedir.'/'.$process.'/log/run');
-	while (<$fh>) {
-		chomp;
-		if (m!s6-log[^/]+(/[^\s]+)!) {
-			return $1.'/current';
-		}
-	}
-	close $fh;
-
-	return;
 }
 
 sub service_dirs {
