@@ -43,7 +43,7 @@ my $svsh = $class->new(%$opts);
 my $term = Term::ShellUI->new(
 	commands => {
 		status => {
-			desc => 'Lists all processes',
+			desc => 'Lists all processes and their statuses',
 			method => sub {
 				my %statuses = %{$svsh->status(@_)};
 
@@ -56,13 +56,16 @@ my $term = Term::ShellUI->new(
 					}
 					foreach my $sv (keys %$collapsed) {
 						my $status_counters = {};
+						my $duration = 0;
 						foreach my $proc (@{$collapsed->{$sv}}) {
 							$status_counters->{$proc->{status}} += 1;
+							$duration = $proc->{duration}
+								if $proc->{duration} > $duration;
 						}
 						$statuses{$sv} = {
 							status => join(', ', map($status_counters->{$_}.' '.$_, sort(keys(%$status_counters)))),
 							pid => '-',
-							duration => 0
+							duration => $duration
 						};
 					}
 				}
@@ -100,27 +103,28 @@ my $term = Term::ShellUI->new(
 			}
 		},
 		start => {
-			desc => 'Starts process(es)',
+			desc => 'Starts a list of processes',
 			minargs => 1,
 			method => sub { print $svsh->start(@_) }
 		},
 		stop => {
-			desc => 'Stops a running process',
+			desc => 'Stops a list of running processes',
 			minargs => 1,
 			method => sub { print $svsh->stop(@_) }
 		},
 		restart => {
-			desc => 'Stops and start a process or processes',
+			desc => 'Restarts a list of processes',
 			minargs => 1,
 			method => sub { print $svsh->restart(@_) }
 		},
 		signal => {
-			desc => 'Sends a signal to a process (or processes)',
-			minargs => 1,
+			desc => 'Sends a signal to a list of processes',
+			minargs => 2,
 			method => sub { print $svsh->signal(@_) }
 		},
 		rescan => {
 			desc => 'Rescans the service directory to look for new/removed services',
+			maxargs => 0,
 			method => sub { print $svsh->rescan }
 		},
 		update => { alias => 'rescan' },
