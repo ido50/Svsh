@@ -29,20 +29,12 @@ has 'statuses' => (
 requires qw/status start stop restart signal rescan terminate fg logfile/;
 
 before [qw/start stop restart/] => sub {
-	my %services;
-	foreach (@{$_[2]->{args}}) {
-		if (m/\*/) {
-			# this is a wildcard, find all services that match it
-			my $regex = $_; $regex =~ s/\*/.*/; $regex = qr/^$regex$/;
-			foreach my $sv (grep { m/$regex/ } keys %{$_[0]->statuses}) {
-				$services{$sv} = 1;
-			}
-		} else {
-			$services{$_} = 1;
-		}
-	}
+	$_[2]->{args} = [$_[0]->_expand_wildcards(@{$_[2]->{args}})];
+};
 
-	$_[2]->{args} = [keys %services];
+before signal => sub {
+	my ($signal, @svcs) = @{$_[2]->{args}};
+	$_[2]->{args} = [$signal, $_[0]->_expand_wildcards(@svcs)];
 };
 
 around 'status' => sub {
@@ -85,6 +77,25 @@ sub find_logfile {
 	return unless $fd;
 
 	return readlink("/proc/$pid/fd/$fd").$self->logfile;
+}
+
+sub _expand_wildcards {
+	my $self = shift;
+
+	my %services;
+	foreach (@_) {
+		if (m/\*/) {
+			# this is a wildcard, find all services that match it
+			my $regex = $_; $regex =~ s/\*/.*/; $regex = qr/^$regex$/;
+			foreach my $sv (grep { m/$regex/ } keys %{$self->statuses}) {
+				$services{$sv} = 1;
+			}
+		} else {
+			$services{$_} = 1;
+		}
+	}
+
+	return keys %services;
 }
 
 1;
