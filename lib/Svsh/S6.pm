@@ -27,13 +27,13 @@ sub status {
 
 sub start {
 	foreach (@{$_[2]->{args}}) {
-		$_[0]->run_cmd('s6-svc', '-u', map { $_[0]->basedir.'/'.$_ } $_);
+		$_[0]->run_cmd('s6-svc', '-u', $_[0]->basedir.'/'.$_);
 	}
 }
 
 sub stop {
 	foreach (@{$_[2]->{args}}) {
-		$_[0]->run_cmd('s6-svc', '-Dd', map { $_[0]->basedir.'/'.$_ } $_);
+		$_[0]->run_cmd('s6-svc', '-Dd', $_[0]->basedir.'/'.$_);
 	}
 }
 
