@@ -9,7 +9,7 @@ with 'Svsh';
 
 sub status {
 	my $statuses = {};
-	foreach ($_[0]->service_dirs) {
+	foreach ($_[0]->_service_dirs) {
 		my $raw = $_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_);
 		my ($status, $comment, $seconds) = ($raw =~ m/(up|down) \(([^\)]+)\) (\d+)/);
 		$statuses->{$_} = {
@@ -76,7 +76,7 @@ sub fg {
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
 }
 
-sub service_dirs {
+sub _service_dirs {
 	my $basedir = shift->basedir;
 
 	opendir(my $dh, $basedir);

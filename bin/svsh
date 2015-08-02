@@ -18,7 +18,7 @@ use Try::Tiny;
 
 my $go = Getopt::Compact->new(
 	name => 'svsh',
-	modes => ['perp', 's6'],
+	modes => ['perp', 's6', 'runit'],
 	struct => [
 		[['d', 'basedir'], 'service directory (directory on which the supervisor was started)', '=s'],
 		[['b', 'bindir'], 'directory where the supervisor is installed (e.g. /usr/sbin)', ':s'],
@@ -27,8 +27,9 @@ my $go = Getopt::Compact->new(
 );
 my $opts = $go->opts;
 
-my $class = 'Svsh::' . ( delete $opts->{perp} ? 'Perp' :
-				 delete $opts->{s6}   ? 'S6'   :
+my $class = 'Svsh::' . ( delete $opts->{perp}  ? 'Perp'  :
+				 delete $opts->{s6}    ? 'S6'    :
+				 delete $opts->{runit} ? 'Runit' :
 				 confess 'What supervisor are you using?' );
 
 eval "require $class";
@@ -125,7 +126,13 @@ my $term = Term::ShellUI->new(
 		rescan => {
 			desc => 'Rescans the service directory to look for new/removed services',
 			maxargs => 0,
-			method => sub { print $svsh->rescan }
+			method => sub {
+				if ($svsh->can('rescan')) {
+					print $svsh->rescan;
+				} else {
+					print ref($svsh).' does not support the rescan command', "\n";
+				}
+			}
 		},
 		update => { alias => 'rescan' },
 		fg => {
@@ -136,7 +143,14 @@ my $term = Term::ShellUI->new(
 		},
 		terminate => {
 			desc => 'Shut down the process supervisor (all processes will terminate)',
-			method => sub { $svsh->terminate(); shift->process_a_cmd('quit'); }
+			method => sub {
+				if ($svsh->can('terminate')) {
+					$svsh->terminate();
+					shift->process_a_cmd('quit');
+				} else {
+					print ref($svsh).' does not support the terminate command', "\n";
+				}
+			}
 		},
 		shutdown => { alias => 'terminate' },
 		help => {

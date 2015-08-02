@@ -26,7 +26,7 @@ has 'statuses' => (
 	writer => '_set_statuses'
 );
 
-requires qw/status start stop restart signal rescan terminate fg/;
+requires qw/status start stop restart signal fg/;
 
 before [qw/start stop restart/] => sub {
 	$_[2]->{args} = [$_[0]->_expand_wildcards(@{$_[2]->{args}})];
@@ -71,7 +71,7 @@ sub find_logfile {
 
 	my $file;
 
-	if ($exe =~ m/tinylog/ || $exe =~ m/s6-log/) {
+	if ($exe =~ m/tinylog/ || $exe =~ m/s6-log/ || $exe =~ m/svlogd/) {
 		# look for a link to a /current file under /proc/$pid/fd
 		opendir my $dir, "/proc/$pid/fd";
 		($file) = grep { m!/current$! } map { readlink("/proc/$pid/fd/$_") } grep { !/^\.\.?$/ } readdir $dir;
