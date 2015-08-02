@@ -41,7 +41,7 @@ _Required_. Base directory of services supervised by the supervision suite.
 
 ## -s, --suite
 
-_Require_. The supervision suite managing the base directory. Either `perp`,
+_Required_. The supervision suite managing the base directory. Either `perp`,
 `s6` or `runit`.
 
 ## -b, --bindir
@@ -103,7 +103,7 @@ Causes the supervision suite to rescan the base directory for new or removed ser
 
 "Moves" a service to the foreground, so that its output streams (at least standard output,
 possibly standard error) are printed on screen. In reality, it determines where the process'
-log file is located, and tails it with `tail -f`. See ["LOGGING"](#logging) for more details, as this
+log file is located, and tails it with `tail -f`. See ["LOG INSPECTION"](#log-inspection) for more details, as this
 is a complicated subject.
 
         svsh> fg nginx
@@ -136,7 +136,7 @@ Quits the shell.
 
 # ADVANCED FEATURES AND IMPORTANT INFORMATION
 
-## LOGGING
+## LOG INSPECTION
 
 All of the supported supervision suites do not enforce a logging scheme on managed
 services. While all of them provide a logging tool (`perp` provides `tinylog` and
@@ -149,7 +149,7 @@ log files are stored, if at all.
 Currently, `svsh` will attempt to find the log file of a service by checking the
 pid of the associated log process, and if (and only if) that process is one of the
 supported loggers (`tinylog`, `s6-log` or `svlogd`), it will try to find the
-file descriptor used by that process under `/proc/<pid`/fd>. As long as your services
+file descriptor used by that process under `/proc/<pid>/fd`. As long as your services
 are being logged by one of these tools, `svsh` _should_ be able to `tail` their log
 files  when the ["fg service"](#fg-service) command is used. However, if the log file is being rotated
 while it is being tailed, behavior is currently undefined (will probably stop working until

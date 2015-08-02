@@ -123,7 +123,7 @@ Causes the supervision suite to rescan the base directory for new or removed ser
 
 "Moves" a service to the foreground, so that its output streams (at least standard output,
 possibly standard error) are printed on screen. In reality, it determines where the process'
-log file is located, and tails it with C<tail -f>. See L</"LOGGING"> for more details, as this
+log file is located, and tails it with C<tail -f>. See L</"LOG INSPECTION"> for more details, as this
 is a complicated subject.
 
 	svsh> fg nginx
@@ -156,7 +156,7 @@ Quits the shell.
 
 =head1 ADVANCED FEATURES AND IMPORTANT INFORMATION
 
-=head2 LOGGING
+=head2 LOG INSPECTION
 
 All of the supported supervision suites do not enforce a logging scheme on managed
 services. While all of them provide a logging tool (C<perp> provides C<tinylog> and
@@ -169,7 +169,7 @@ log files are stored, if at all.
 Currently, C<svsh> will attempt to find the log file of a service by checking the
 pid of the associated log process, and if (and only if) that process is one of the
 supported loggers (C<tinylog>, C<s6-log> or C<svlogd>), it will try to find the
-file descriptor used by that process under C</proc/<pid>/fd>. As long as your services
+file descriptor used by that process under C<< /proc/<pid>/fd >>. As long as your services
 are being logged by one of these tools, C<svsh> I<should> be able to C<tail> their log
 files  when the L</"fg service"> command is used. However, if the log file is being rotated
 while it is being tailed, behavior is currently undefined (will probably stop working until
