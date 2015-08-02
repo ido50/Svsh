@@ -1,0 +1,22 @@
+<h1>NAME</h1>
+
+<p>svsh - Process supervision shell for Perp/S6/Runit</p>
+
+<h1>DESCRIPTION</h1>
+
+<p><code>svsh</code> is a command line shell for process supervision suites of the <a href="http://cr.yp.to/daemontools.html">daemontools</a> family. Currently, it supports
+<a href="http://b0llix.net/perp/">perp</a>, <a href="http://www.skarnet.org/software/s6/index.html">s6</a>
+and <a href="http://smarden.org/runit/">runit</a> (yes, ironically <code>daemontools</code> is not supported
+yet). It provides a unified interface allowing easy inspection and manipulation of services
+(i.e. processes) managed by supported supervision suites.</p>
+
+<p><code>scsh</code> does not require any configurations or changes to your suite's service directories;
+just point it at a base directory and you immediately get a usable shell, listing all
+services and their statuses, and accepting commands to perform on them.</p>
+
+<p>The shell provides a very simple syntax that is easy to remember, far simpler than the
+particular syntax of the underlying tools provided by the supervision suite itself. Instead
+of having to execute <code>perpctl -b /services q nginx</code> to restart an nginx service running from
+<code>/services/nginx</code>, just execute <code>restart nginx</code>. Couldn't be simpler.</p>
+
+<p><img src="https://ido50.github.io/Svsh/screenshot.png" alt="screenshot" title="" /></p>
