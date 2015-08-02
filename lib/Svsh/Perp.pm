@@ -1,7 +1,5 @@
 package Svsh::Perp;
 
-use autodie;
-
 use Moo;
 use namespace::clean;
 

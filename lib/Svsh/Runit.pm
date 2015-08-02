@@ -1,7 +1,5 @@
 package Svsh::Runit;
 
-use autodie;
-
 use Moo;
 use namespace::clean;
 

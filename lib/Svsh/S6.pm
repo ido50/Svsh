@@ -1,7 +1,5 @@
 package Svsh::S6;
 
-use autodie;
-
 use Moo;
 use namespace::clean;
 
