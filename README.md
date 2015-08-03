@@ -27,7 +27,7 @@ services and their statuses, and accepting commands to perform on them.
 The shell provides a very simple syntax that is easy to remember, far simpler than the
 particular syntax of the underlying supervision suite. Instead of having to execute
 `perpctl -b /services q nginx` to restart an `nginx` service running from `/services/nginx`,
-just execute `restart nginx`. Couldn't be simpler. Want to send an `HUP` signal to all
+just execute `restart nginx`. Couldn't be simpler. Want to send a `HUP` signal to all
 services whose names begin with `"worker"`? just execute `signal hup worker*`.
 
 `svsh` is inspired by [supervisord](http://www.supervisord.org/)'s `supervisorctl` shell. I've
@@ -189,7 +189,7 @@ be very useful with lots of multi-process services.
 Currently, `svsh` determines multi-process services if their names are postfixed with a dash
 and a number. For example, if you have a service called `worker` that you need 3 processes
 of which to run, you can create `worker-1`, `worker-2` and `worker-3` service directories.
-If the ["-c, --collapse" in collapse](https://metacpan.org/pod/collapse#c---collapse) option is on, `svsh` will collapse all of these into
+If the [collapse](#c-collapse) option is on, `svsh` will collapse all of these into
 just one line, under the name `status`.
 
         svsh> status
