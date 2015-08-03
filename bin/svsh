@@ -4,8 +4,6 @@ BEGIN {
 	binmode STDOUT, ':encoding(utf8)';
 }
 
-# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
-
 use lib 'lib';
 use warnings;
 use strict;

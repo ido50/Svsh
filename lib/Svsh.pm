@@ -1,6 +1,6 @@
 package Svsh;
 
-# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit (base class)
+# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
 
 our $VERSION = "1.000000";
 $VERSION = eval $VERSION;
@@ -10,6 +10,17 @@ use Moo::Role;
 =head1 NAME
 
 Svsh - Process supervision shell for daemontools/perp/s6/runit (base class)
+
+=head1 SYNOPSIS
+
+	package Svsh::SomeSupervisor;
+
+	use Moo;
+	use namespace::clean;
+
+	with 'Svsh';
+
+	# implement required methods
 
 =head1 DESCRIPTION
 
