@@ -40,8 +40,8 @@ _Required_. Base directory of services supervised by the supervision suite.
 
 ## -s, --suite
 
-_Required_. The supervision suite managing the base directory. Either `` daemontools, `perp`,
-`s6` or `runit`. ``
+_Required_. The supervision suite managing the base directory. Either `daemontools`, `perp`,
+`s6` or `runit`.
 
 ## -b, --bindir
 
@@ -269,11 +269,3 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 63:
-
-    Unterminated C<...> sequence

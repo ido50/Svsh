@@ -60,7 +60,7 @@ I<Required>. Base directory of services supervised by the supervision suite.
 
 =head2 -s, --suite
 
-I<Required>. The supervision suite managing the base directory. Either C<daemontools, C<perp>,
+I<Required>. The supervision suite managing the base directory. Either C<daemontools>, C<perp>,
 C<s6> or C<runit>.
 
 =head2 -b, --bindir
