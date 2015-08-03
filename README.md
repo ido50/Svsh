@@ -32,7 +32,7 @@ services whose names begin with `"worker"`? just execute `signal hup worker*`.
 `svsh` is inspired by [supervisord](http://www.supervisord.org/)'s `supervisorctl` shell. I've
 attempted to provide a similar syntax and feature set.
 
-## OPTIONS
+# OPTIONS
 
 ## -d, --basedir
 

@@ -50,7 +50,7 @@ services whose names begin with C<"worker">? just execute C<signal hup worker*>.
 C<svsh> is inspired by L<supervisord|http://www.supervisord.org/>'s C<supervisorctl> shell. I've
 attempted to provide a similar syntax and feature set.
 
-=head2 OPTIONS
+=head1 OPTIONS
 
 =head2 -d, --basedir
 

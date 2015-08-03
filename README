@@ -33,7 +33,7 @@ DESCRIPTION
     "supervisorctl" shell. I've attempted to provide a similar syntax and
     feature set.
 
-  OPTIONS
+OPTIONS
   -d, --basedir
     *Required*. Base directory of services supervised by the supervision
     suite.
