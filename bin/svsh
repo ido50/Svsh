@@ -441,6 +441,34 @@ Please report any bugs or feature requests to
 C<bug-Svsh@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh>.
 
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc svsh
+
+You can also look for information at:
+
+=over 4
+ 
+=item * RT: CPAN's request tracker
+ 
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Svsh>
+ 
+=item * AnnoCPAN: Annotated CPAN documentation
+ 
+L<http://annocpan.org/dist/Svsh>
+ 
+=item * CPAN Ratings
+ 
+L<http://cpanratings.perl.org/d/Svsh>
+ 
+=item * Search CPAN
+ 
+L<http://search.cpan.org/dist/Svsh/>
+ 
+=back
+
 =head1 AUTHOR
 
 Ido Perlmuter <ido at ido50 dot net>
