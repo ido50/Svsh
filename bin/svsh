@@ -4,7 +4,7 @@ BEGIN {
 	binmode STDOUT, ':encoding(utf8)';
 }
 
-# ABSTRACT: Process supervision shell for Perp/S6/Runit
+# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
 
 use lib 'lib';
 use warnings;
@@ -16,7 +16,7 @@ use Term::ShellUI;
 
 =head1 NAME
 
-svsh - Process supervision shell for Perp/S6/Runit
+svsh - Process supervision shell for daemontools/perp/s6/runit
 
 =head1 SYNOPSIS
 
@@ -35,10 +35,9 @@ svsh - Process supervision shell for Perp/S6/Runit
 =end markdown
 
 C<svsh> is a command line shell for process supervision suites of the L<daemontools|http://cr.yp.to/daemontools.html> family. Currently, it supports
-L<perp|http://b0llix.net/perp/>, L<s6|http://www.skarnet.org/software/s6/index.html>
-and L<runit|http://smarden.org/runit/> (yes, ironically C<daemontools> is not supported
-yet). It provides a unified interface allowing easy inspection and manipulation of services
-(i.e. processes) managed by supported supervision suites.
+daemontools, L<perp|http://b0llix.net/perp/>, L<s6|http://www.skarnet.org/software/s6/index.html>
+and L<runit|http://smarden.org/runit/>. It provides a unified interface allowing easy inspection
+and manipulation of services (i.e. processes) managed by supported supervision suites.
 
 C<svsh> does not require any configurations or changes to your suite's service directories;
 just point it at a base directory and you immediately get a usable shell, listing all
@@ -61,7 +60,7 @@ I<Required>. Base directory of services supervised by the supervision suite.
 
 =head2 -s, --suite
 
-I<Required>. The supervision suite managing the base directory. Either C<perp>,
+I<Required>. The supervision suite managing the base directory. Either C<daemontools, C<perp>,
 C<s6> or C<runit>.
 
 =head2 -b, --bindir
@@ -159,19 +158,19 @@ Quits the shell.
 =head2 LOG INSPECTION
 
 All of the supported supervision suites do not enforce a logging scheme on managed
-services. While all of them provide a logging tool (C<perp> provides C<tinylog> and
-C<sissylog>; C<s6> provides C<s6-log>; C<runit> provides C<svlogd>), none of them
-enforce their usage. It is actually not uncommon among users of these suites to
-use a logging tool provided by one suite for services managed by another one.
-This means it is hard for an external program such as C<svsh> to determine where
-log files are stored, if at all.
+services. While all of them provide a logging tool (C<daemontools> provides C<multilog>,
+C<perp> provides C<tinylog> and C<sissylog>; C<s6> provides C<s6-log>; C<runit>
+provides C<svlogd>), none of them enforce their usage. It is actually not uncommon
+among users of these suites to use a logging tool provided by one suite for services
+managed by another one. This means it is hard for an external program such as C<svsh>
+to determine where log files are stored, if at all.
 
 Currently, C<svsh> will attempt to find the log file of a service by checking the
 pid of the associated log process, and if (and only if) that process is one of the
-supported loggers (C<tinylog>, C<s6-log> or C<svlogd>), it will try to find the
+supported loggers (C<multilog>, C<tinylog>, C<s6-log> or C<svlogd>), it will try to find the
 file descriptor used by that process under C<< /proc/<pid>/fd >>. As long as your services
 are being logged by one of these tools, C<svsh> I<should> be able to C<tail> their log
-files  when the L</"fg service"> command is used. However, if the log file is being rotated
+files  when the L<fg|/"fg service"> command is used. However, if the log file is being rotated
 while it is being tailed, behavior is currently undefined (will probably stop working until
 the command is run again).
 
@@ -298,8 +297,7 @@ my $term = Term::ShellUI->new(
 						sprintf('%5s', $s->{pid}), " \n";
 				}
 				print "\n";
-			},
-			doc => "\nUsage: status\n\nLists all services in the service directory and their statuses, including uptime (or downtime) and PIDs.\n\nIn Perp, status can be 'up', 'down', 'resetting', 'disabled' or 'backoff' (meaning the process should be up, but fails to load).\n\nIn S6, only 'up' and 'down' are provided.\n"
+			}
 		},
 		toggle => {
 			desc => 'Toggle svsh switches (e.g. collapse)',
@@ -389,7 +387,7 @@ sub _check_suite {
 
 	$suite
 		|| _error('Suite not provided');
-	$suite =~ m/^(perp|s6|runit)$/
+	$suite =~ m/^(perp|s6|runit|daemontools)$/
 		|| _error('Suite must be perp, s6 or runit');
 }
 

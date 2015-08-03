@@ -1,6 +1,6 @@
 # NAME
 
-svsh - Process supervision shell for Perp/S6/Runit
+svsh - Process supervision shell for daemontools/perp/s6/runit
 
 # SYNOPSIS
 
@@ -15,10 +15,9 @@ svsh - Process supervision shell for Perp/S6/Runit
 ![screenshot](https://ido50.github.io/Svsh/screenshot.png)
 
 `svsh` is a command line shell for process supervision suites of the [daemontools](http://cr.yp.to/daemontools.html) family. Currently, it supports
-[perp](http://b0llix.net/perp/), [s6](http://www.skarnet.org/software/s6/index.html)
-and [runit](http://smarden.org/runit/) (yes, ironically `daemontools` is not supported
-yet). It provides a unified interface allowing easy inspection and manipulation of services
-(i.e. processes) managed by supported supervision suites.
+daemontools, [perp](http://b0llix.net/perp/), [s6](http://www.skarnet.org/software/s6/index.html)
+and [runit](http://smarden.org/runit/). It provides a unified interface allowing easy inspection
+and manipulation of services (i.e. processes) managed by supported supervision suites.
 
 `svsh` does not require any configurations or changes to your suite's service directories;
 just point it at a base directory and you immediately get a usable shell, listing all
@@ -41,8 +40,8 @@ _Required_. Base directory of services supervised by the supervision suite.
 
 ## -s, --suite
 
-_Required_. The supervision suite managing the base directory. Either `perp`,
-`s6` or `runit`.
+_Required_. The supervision suite managing the base directory. Either `` daemontools, `perp`,
+`s6` or `runit`. ``
 
 ## -b, --bindir
 
@@ -139,19 +138,19 @@ Quits the shell.
 ## LOG INSPECTION
 
 All of the supported supervision suites do not enforce a logging scheme on managed
-services. While all of them provide a logging tool (`perp` provides `tinylog` and
-`sissylog`; `s6` provides `s6-log`; `runit` provides `svlogd`), none of them
-enforce their usage. It is actually not uncommon among users of these suites to
-use a logging tool provided by one suite for services managed by another one.
-This means it is hard for an external program such as `svsh` to determine where
-log files are stored, if at all.
+services. While all of them provide a logging tool (`daemontools` provides `multilog`,
+`perp` provides `tinylog` and `sissylog`; `s6` provides `s6-log`; `runit`
+provides `svlogd`), none of them enforce their usage. It is actually not uncommon
+among users of these suites to use a logging tool provided by one suite for services
+managed by another one. This means it is hard for an external program such as `svsh`
+to determine where log files are stored, if at all.
 
 Currently, `svsh` will attempt to find the log file of a service by checking the
 pid of the associated log process, and if (and only if) that process is one of the
-supported loggers (`tinylog`, `s6-log` or `svlogd`), it will try to find the
+supported loggers (`multilog`, `tinylog`, `s6-log` or `svlogd`), it will try to find the
 file descriptor used by that process under `/proc/<pid>/fd`. As long as your services
 are being logged by one of these tools, `svsh` _should_ be able to `tail` their log
-files  when the ["fg service"](#fg-service) command is used. However, if the log file is being rotated
+files  when the [fg](#fg-service) command is used. However, if the log file is being rotated
 while it is being tailed, behavior is currently undefined (will probably stop working until
 the command is run again).
 
@@ -270,3 +269,11 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 63:
+
+    Unterminated C<...> sequence

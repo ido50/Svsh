@@ -83,7 +83,7 @@ sub find_logfile {
 
 	my $file;
 
-	if ($exe =~ m/tinylog/ || $exe =~ m/s6-log/ || $exe =~ m/svlogd/) {
+	if ($exe =~ m/tinylog/ || $exe =~ m/s6-log/ || $exe =~ m/svlogd/ || $exe =~ m/multilog/) {
 		# look for a link to a /current file under /proc/$pid/fd
 		opendir my $dir, "/proc/$pid/fd";
 		($file) = grep { m!/current$! } map { readlink("/proc/$pid/fd/$_") } grep { !/^\.\.?$/ } readdir $dir;
@@ -110,6 +110,16 @@ sub _expand_wildcards {
 	}
 
 	return keys %services;
+}
+
+sub _service_dirs {
+	my $basedir = shift->basedir;
+
+	opendir(my $dh, $basedir);
+	my @dirs = grep { !/^\./ && -d "$basedir/$_" } readdir $dh;
+	closedir $dh;
+
+	return sort @dirs;
 }
 
 =head1 BUGS AND LIMITATIONS

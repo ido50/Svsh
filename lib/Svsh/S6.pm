@@ -74,15 +74,5 @@ sub fg {
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
 }
 
-sub _service_dirs {
-	my $basedir = shift->basedir;
-
-	opendir(my $dh, $basedir);
-	my @dirs = grep { !/^\./ && -d "$basedir/$_" } readdir $dh;
-	closedir $dh;
-
-	return sort @dirs;
-}
-
 1;
 __END__

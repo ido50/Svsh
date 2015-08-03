@@ -10,15 +10,10 @@ sub status {
 	foreach ($_[0]->_service_dirs) {
 		my $raw = $_[0]->run_cmd('sv', 'status', $_[0]->basedir.'/'.$_);
 
-		my ($status) = $raw =~ m/^([^:]+):/;
+		my ($status, $pid, $duration) = $raw =~ m/^([^:]+):[^:]+:(?: \(pid (\d+)\))? (\d+)s/;
 
-		my ($pid, $duration);
-
-		if ($status eq 'run') {
-			# the service is up
-			$status = 'up';
-			($pid, $duration) = $raw =~ m/\(pid (\d+)\) (\d+)s/;
-		}
+		$status = 'up'
+			if $status eq 'run';
 
 		$statuses->{$_} = {
 			status => $status,
@@ -68,16 +63,6 @@ sub fg {
 		|| die "Can't find out process' log file";
 
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
-}
-
-sub _service_dirs {
-	my $basedir = shift->basedir;
-
-	opendir(my $dh, $basedir);
-	my @dirs = grep { !/^\./ && -d "$basedir/$_" } readdir $dh;
-	closedir $dh;
-
-	return sort @dirs;
 }
 
 1;
