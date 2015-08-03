@@ -257,7 +257,10 @@ You can also look for information at:
 
 # AUTHOR
 
-Ido Perlmuter <ido at ido50 dot net>
+Ido Perlmuter <ido at ido50 dot net>.
+
+Thanks to the guys at the [supervision mailing list](http://skarnet.org/lists.html#supervision)
+for helping out with suggestions.
 
 # LICENSE AND COPYRIGHT
 

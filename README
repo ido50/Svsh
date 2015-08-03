@@ -249,7 +249,11 @@ SUPPORT
         <http://search.cpan.org/dist/Svsh/>
 
 AUTHOR
-    Ido Perlmuter <ido at ido50 dot net>
+    Ido Perlmuter <ido at ido50 dot net>.
+
+    Thanks to the guys at the supervision mailing list
+    <http://skarnet.org/lists.html#supervision> for helping out with
+    suggestions.
 
 LICENSE AND COPYRIGHT
     Copyright (c) 2015, Ido Perlmuter "ido at ido50 dot net".

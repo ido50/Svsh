@@ -471,7 +471,10 @@ L<http://search.cpan.org/dist/Svsh/>
 
 =head1 AUTHOR
 
-Ido Perlmuter <ido at ido50 dot net>
+Ido Perlmuter <ido at ido50 dot net>.
+
+Thanks to the guys at the L<supervision mailing list|http://skarnet.org/lists.html#supervision>
+for helping out with suggestions.
 
 =head1 LICENSE AND COPYRIGHT
 
