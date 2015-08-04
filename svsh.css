@@ -1,0 +1,78 @@
+body {
+	background-color: #A7DBD8;
+	font-size: 1.2em;
+	padding-top: 70px;
+}
+.ui.menu.top {
+	background-color: #004853;
+	box-shadow: 0 0 5px #52310A;
+}
+.ui.menu.top .header.item {
+	padding: 0.4em 0.8em;
+	font-size: 1.4em;
+}
+.ui.menu.top .header.item a,
+.ui.menu.top .item:hover {
+	color: #FA6900;
+}
+.ui.menu.top .item {
+	color: #fff;
+}
+.container {
+	background-color: #E0E4CC;
+	padding: 1em;
+	border: 1px solid #F63700;
+	border-radius: 6px;
+	box-shadow: 1px 1px 2px #875A23;
+}
+.container + .container {
+	margin-top: 2em;
+}
+.container h1 {
+	font-size: 2em;
+}
+.container .ui.segment {
+	font-family: "Source Code Pro", "Courier New", Courier, monospace;
+	background-color: #004853;
+	color: #fff;
+}
+
+.main.container {
+	text-align: center;
+}
+.main.container h1 {
+	font-size: 4em;
+}
+.main.container h2 {
+	margin-top: 0;
+}
+.main a:first-of-type {
+	margin-top: 1em;
+}
+.main .ui.label {
+	clear: both;
+}
+
+#use .ui.table {
+	background: transparent;
+	border: none;
+}
+#use .ui.table pre {
+	font-family: "Source Code Pro", "Courier New", Courier, monospace;
+	margin: 0.5em 0 0 0;
+	background-color: rgba(0, 72, 83, .7);
+	color: #EEEEEE;
+	padding: 0 1em;
+}
+
+.footer.ui.segment {
+	border-radius: 0;
+	text-align: center;
+	margin-top: 2em;
+	font-size: 0.8em;
+	color: #ccc;
+}
+
+.footer.ui.segment p {
+	line-height: 0.6em;
+}

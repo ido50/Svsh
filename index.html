@@ -1,283 +1,215 @@
-<h1>NAME</h1>
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Standard Meta -->
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
-<p>svsh - Process supervision shell for daemontools/perp/s6/runit</p>
+		<title>svsh &middot; the supervisor shell</title>
 
-<h1>SYNOPSIS</h1>
+		<link rel="stylesheet" type="text/css" href="semantic-ui/semantic.min.css" />
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:500" />
+		<link rel="stylesheet" type="text/css" href="svsh.css" />
 
-<pre><code>    # from the command line
-    $ svsh --suite perp --basedir /etc/services
+		<script src="jquery-1.11.3.min.js"></script>
+		<script src="semantic-ui/semantic.min.js"></script>
+	</head>
+	<body>
+		<div class="ui large top fixed hidden menu">
+			<div class="header item">
+				<a href="/">svsh</a>
+			</div>
+			<a href="#home" class="active item">Home</a>
+			<a href="#about" class="active item">About</a>
+			<a href="#install" class="item">Install</a>
+			<a href="#use" class="item">Use</a>
+		</div>
 
-    # run one specific command and exit
-    $ svsh --suite runit --basedir /var/services restart nginx
-</code></pre>
+		<div id="home" class="ui main container">
+			<h1>svsh</h1>
+			<h2>Take control of your supervisor</h2>
+			<img class="ui centered bordered image" src="screenshot.png" alt="svsh" />
+			<a class="ui labeled icon positive button" href="#install">
+				<i class="download icon"></i>
+				Get Started
+			</a>
+			<div class="ui label">
+				latest version: 1.0.0
+			</div>
+		</div>
 
-<h1>DESCRIPTION</h1>
+		<div id="about" class="ui container">
+			<h1>About</h1>
 
-<p><img src="https://ido50.github.io/Svsh/screenshot.png" alt="screenshot" title="" /></p>
+			<p><strong>svsh</strong> is a free software command line shell for process supervision suites of the daemontools family. Currently, it supports <a href="http://cr.yp.to/daemontools.html" rel="external">daemontools</a>, <a href="http://b0llix.net/perp/" rel="external">perp</a>, <a href="http://www.skarnet.org/software/s6/index.html" rel="external">s6</a> and <a href="http://smarden.org/runit/" rel="external">runit</a>. It provides a unified interface allowing easy inspection and manipulation of services (i.e. processes) managed by these suites.</p>
 
-<p><code>svsh</code> is a command line shell for process supervision suites of the <a href="http://cr.yp.to/daemontools.html">daemontools</a> family. Currently, it supports
-daemontools, <a href="http://b0llix.net/perp/">perp</a>, <a href="http://www.skarnet.org/software/s6/index.html">s6</a>
-and <a href="http://smarden.org/runit/">runit</a>. It provides a unified interface allowing easy inspection
-and manipulation of services (i.e. processes) managed by supported supervision suites.</p>
+			<p>With <strong>svsh</strong>, it is easy to get a complete view of your processes and their statuses. You can bring processes up, down, send them signals and view their output in real time. You don't need to remember the particular syntax of the control tools provided by your suite. Instead,</p>
+		</div>
 
-<p><code>svsh</code> does not require any configurations or changes to your suite's service directories;
-just point it at a base directory and you immediately get a usable shell, listing all
-services and their statuses, and accepting commands to perform on them.</p>
+		<div id="install" class="ui container">
+			<h1>Install</h1>
 
-<p>The shell provides a very simple syntax that is easy to remember, far simpler than the
-particular syntax of the underlying supervision suite. Instead of having to execute
-<code>perpctl -b /services q nginx</code> to restart an <code>nginx</code> service running from <code>/services/nginx</code>,
-just execute <code>restart nginx</code>. Couldn't be simpler. Want to send a <code>HUP</code> signal to all
-services whose names begin with <code>"worker"</code>? just execute <code>signal hup worker*</code>.</p>
+			<p><strong>svsh</strong> releases are hosted in <a href="https://metacpan.org/" rel="external">CPAN</a> and can be installed like any other Perl module.</p>
 
-<p><code>svsh</code> is inspired by <a href="http://www.supervisord.org/">supervisord</a>'s <code>supervisorctl</code> shell. I've
-attempted to provide a similar syntax and feature set.</p>
+			<h2>with <a href="https://metacpan.org/pod/distribution/App-cpanminus/bin/cpanm" rel="external">cpanm</a>:</h2>
+			<div class="ui segment">
+				<p>$ cpanm -S Svsh</p>
+			</div>
 
-<h2>OPTIONS</h2>
+			<h2>with the cpan shell:</h2>
+			<div class="ui segment">
+				<p>$ cpan Svsh</p>
+			</div>
 
-<h2>-d, --basedir</h2>
+			<h2>building manually:</h2>
+			<p><a href="https://metacpan.org/pod/distribution/Svsh/bin/svsh" rel="external">Download the tarball</a>, extract it, and build with:</p>
+			<div class="ui segment">
+				<p>$ perl Makefile.PL<br />$ make && make test<br />$ sudo make install</p>
+			</div>
+		</div>
 
-<p><em>Required</em>. Base directory of services supervised by the supervision suite.</p>
+		<div id="use" class="ui container">
+			<h1>Use</h1>
 
-<h2>-s, --suite</h2>
+			<p><strong>svsh</strong> is ready to rock right out of the box. No configuration or changes to your service directories are needed. Simply point it to your base directory (the directory from which your supervisor is running), and you instantly get a usable shell:</p>
 
-<p><em>Required</em>. The supervision suite managing the base directory. Either <code>daemontools</code>, <code>perp</code>,
-<code>s6</code> or <code>runit</code>.</p>
+			<div class="ui segment">
+				<p>$ svsh --suite runit --basedir /etc/services</p>
+			</div>
 
-<h2>-b, --bindir</h2>
+			<p>Once started, you get a list of all managed services, including their statuses, uptime or downtime durations, and process IDs.</p>
 
-<p>If the supervision suite's tools are not in the environment <code>PATH</code> variable,
-you can provide the directory where they are located (e.g. <code>/usr/local/bin</code>).</p>
+			<div class="ui segment">
+				<pre><span style="background-color: #fff; color: #000">         process |     status | duration |   pid </span>
+         <strong>haproxy</strong> |         <span style="color: #00D918">up</span> |     126s | 28444 
+           <strong>nginx</strong> |       <span style="color: #E21100">down</span> |      12s |     -
+        <strong>worker-1</strong> |         <span style="color: #00D918">up</span> |     126s | 28438 
+        <strong>worker-2</strong> |         <span style="color: #00D918">up</span> |     126s | 28443 
+        <strong>worker-3</strong> |         <span style="color: #00D918">up</span> |      55s | 28437 
 
-<h2>-c, --collapse</h2>
+svsh></pre>
+			</div>
 
-<p>Collapse multi-process services to one line in <code>status</code>. See <a href="#collapse">"COLLAPSE"</a>
-for more details. This can be changed from inside the shell too.</p>
+			<h2>Commands</h2>
 
-<h1>COMMANDS</h1>
+			<p>The following commands are then available:</p>
 
-<p>The following commands are provided by <code>svsh</code>. Note that some suites do not
-support all commands.</p>
+			<table class="ui padded table">
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">status</th>
+					<td class="thirteen wide">Prints an updated list of service statuses.</td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">start</th>
+					<td class="thirteen wide">Starts a list of services, if they are not already up.<pre>svsh&gt; start nginx haproxy</pre></td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">stop</th>
+					<td class="thirteen wide">Stops a list of services, if they are not already down. They will not be restarted.<pre>svsh&gt; stop nginx</pre></td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">restart</th>
+					<td class="thirteen wide">Restarts a list of services. Most supervisors implement this with a <strong>QUIT</strong> signal.<pre>svsh&gt; restart worker*</pre></td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">signal</th>
+					<td class="thirteen wide">Sends a UNIX signal to a list of services. Not all signals are supported by all supervisors.<pre>svsh&gt; signal hup nginx</pre></td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">fg</th>
+					<td class="thirteen wide">Moves a service to the foreground, so that its output is followed on screen.<pre>svsh&gt; fg worker-2</pre></td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">toggle</th>
+					<td class="thirteen wide">Toggles an <strong>svsh</strong> option. See list of options.<pre>svsh&gt; toggle collapse</pre></td>
+				</tr>
+			</table>
 
-<h2>status</h2>
+			<p>The following commands are implemented by <em>some</em> supervisors:</p>
 
-<p>Prints a list of all services, their statuses (up, down, etc.), uptimes (or
-downtimes) and process IDs. This command is automatically executed upon
-initialization of the shell.</p>
+			<table class="ui padded table">
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">rescan / update</th>
+					<td class="thirteen wide">Causes the supervisor to rescan the base directory for new or removed services.</td>
+				</tr>
+				<tr>
+					<th class="top aligned right aligned three wide" scope="row">terminate / shutdown</th>
+					<td class="thirteen wide">Terminates the supervisor and all services.</td>
+				</tr>
+			</table>
 
-<h2>start service, ...</h2>
+			<h2>Log Inspection</h2>
 
-<p>Starts a list of one or more services, if they are not already up.</p>
+			<p>All of the supported supervision suites do not enforce a logging scheme on managed
+			services. While all of them provide a logging tool (daemontools provides multilog,
+			perp provides tinylog and sissylog; s6 provides s6-log; runit
+			provides svlogd), none of them enforce their usage. It is actually not uncommon
+			among users of these suites to use a logging tool provided by one suite for services
+			managed by another one. This means it is hard for an external program such as svsh
+			to determine where log files are stored, if at all.</p>
 
-<pre><code>    svsh&gt; start nginx haproxy
-</code></pre>
+			<p>Currently, <strong>svsh</strong> will attempt to find the log file of a service by checking the
+			pid of the associated log process, and if (and only if) that process is one of the
+			supported loggers (multilog, tinylog, s6-log or svlogd), it will try to find the
+			file descriptor used by that process under <strong>/proc/&lt;pid&gt;/fd</strong>. As long as your services
+			are being logged by one of these tools, svsh <em>should</em> be able to tail their log
+			files when the fg command is used.</p>
 
-<h2>stop service, ...</h2>
+			<h2>Wildcards</h2>
 
-<p>Stops a list of one or more services. The services stopped will not be restarted.</p>
+			<p><strong>svsh</strong> makes it easy to manipulate multiple services at once. Wildcards are supported
+			by the <code>start</code>, <code>stop</code>, <code>restart</code> and <code>signal</code> commands. If, for example, you have
+			several services whose names start with "worker", you can stop them all by executing
+			<code>stop worker*</code>. Wildcards are also supported at the beginning of the name, so
+			<code>signal term *d</code> will send a TERM signal to all services whose names end with "d".</p>
 
-<pre><code>    svsh&gt; stop nginx haproxy
-</code></pre>
-
-<h2>restart service, ...</h2>
-
-<p>Restarts a list of one or more services. Generally, this means sending a QUIT signal
-to the services, which <em>should</em> cause them to shutdown and be restarted by the
-supervisor.</p>
-
-<pre><code>    svsh&gt; restart nginx haproxy
-</code></pre>
-
-<h2>signal sig service, ...</h2>
-
-<p>Send a UNIX signal to a list of one or more services. The name of the signal can
-be lowercase or uppercase, and may include the prefix <code>"SIG"</code>.</p>
-
-<pre><code>    svsh&gt; signal term nginx
-    svsh&gt; signal SIGUSR1 haproxy
-</code></pre>
-
-<h2>rescan</h2>
-
-<p><em>Alias: update</em>.</p>
-
-<p>Causes the supervision suite to rescan the base directory for new or removed services.</p>
-
-<h2>fg service</h2>
-
-<p>"Moves" a service to the foreground, so that its output streams (at least standard output,
-possibly standard error) are printed on screen. In reality, it determines where the process'
-log file is located, and tails it with <code>tail -f</code>. See <a href="#log-inspection">"LOG INSPECTION"</a> for more details, as this
-is a complicated subject.</p>
-
-<pre><code>    svsh&gt; fg nginx
-</code></pre>
-
-<h2>terminate</h2>
-
-<p><em>Alias: shutdown</em>.</p>
-
-<p>Terminate the supervision suite. This will cause all services managed by the supervisor to
-terminate as well.</p>
-
-<h2>toggle option</h2>
-
-<p>Toggles a shell option on or off. Currently, only the <code>collapse</code> option is supported. The
-<code>status</code> command will be automatically called after toggling the option.</p>
-
-<pre><code>    svsh&gt; toggle collapse
-</code></pre>
-
-<h2>help [ command ]</h2>
-
-<p>Prints help information. Can also provide information about specific commands.</p>
-
-<pre><code>    svsh&gt; help signal
-</code></pre>
-
-<h2>quit</h2>
-
-<p><em>Alias: exit</em>.</p>
-
-<p>Quits the shell.</p>
-
-<h1>ADVANCED FEATURES AND IMPORTANT INFORMATION</h1>
-
-<h2>LOG INSPECTION</h2>
-
-<p>All of the supported supervision suites do not enforce a logging scheme on managed
-services. While all of them provide a logging tool (<code>daemontools</code> provides <code>multilog</code>,
-<code>perp</code> provides <code>tinylog</code> and <code>sissylog</code>; <code>s6</code> provides <code>s6-log</code>; <code>runit</code>
-provides <code>svlogd</code>), none of them enforce their usage. It is actually not uncommon
-among users of these suites to use a logging tool provided by one suite for services
-managed by another one. This means it is hard for an external program such as <code>svsh</code>
-to determine where log files are stored, if at all.</p>
-
-<p>Currently, <code>svsh</code> will attempt to find the log file of a service by checking the
-pid of the associated log process, and if (and only if) that process is one of the
-supported loggers (<code>multilog</code>, <code>tinylog</code>, <code>s6-log</code> or <code>svlogd</code>), it will try to find the
-file descriptor used by that process under <code>/proc/&lt;pid&gt;/fd</code>. As long as your services
-are being logged by one of these tools, <code>svsh</code> <em>should</em> be able to <code>tail</code> their log
-files  when the <a href="#fg-service">fg</a> command is used. However, if the log file is being rotated
-while it is being tailed, behavior is currently undefined (will probably stop working until
-the command is run again).</p>
-
-<h2>WILDCARDS</h2>
-
-<p><code>svsh</code> makes it easy to manipulate multiple services at once. Wildcards are supported
-by the <code>start</code>, <code>stop</code>, <code>restart</code> and <code>signal</code> commands. If, for example, you have
-several services whose names start with "worker", you can stop them all by executing
-<code>stop worker*</code>. Wildcards are also supported at the beginning of the name, so
-<code>signal term *d</code> will send a <code>TERM</code> signal to all services whose names end with "d".</p>
-
-<pre><code>    svsh&gt; status
-       process |     status | duration |   pid
-      worker-1 |         up |    9813s | 25984
-      worker-2 |         up |    9813s | 25976
-      worker-3 |         up |    4393s | 2990
+			<div class="ui segment">
+				<pre>    svsh&gt; status
+<span style="background-color: #fff; color: #000">       process |     status | duration |   pid </span>
+      <strong>worker-1</strong> |         <span style="color: #00D918">up</span> |    9813s | 25984
+      <strong>worker-2</strong> |         <span style="color: #00D918">up</span> |    9813s | 25976
+      <strong>worker-3</strong> |         <span style="color: #00D918">up</span> |    4393s | 2990
 
     svsh&gt; stop worker*
 
     svsh&gt; status
-       process |     status | duration |   pid
-      worker-1 |       down |       2s |     -
-      worker-2 |       down |       2s |     -
-      worker-3 |       down |       2s |     -
-</code></pre>
+<span style="background-color: #fff; color: #000">       process |     status | duration |   pid </span>
+      <strong>worker-1</strong> |       <span style="color: #E21100">down</span> |       2s |     -
+      <strong>worker-2</strong> |       <span style="color: #E21100">down</span> |       2s |     -
+      <strong>worker-3</strong> |       <span style="color: #E21100">down</span> |       2s |     -</pre>
+			</div>
 
-<h2>COLLAPSE</h2>
+			<h2>Collapse</h2>
 
-<p>Often times you would like to run a certain service with X number of identical processes.
-None of the supervision suites have any mechanism to allow this (none that I
-know of at least), apart from creating identical copies of a service directory for every
-process needed. While <code>svsh</code> can't help you with that, it provides a nice feature for collapsing
-these identical services in the output of the <a href="#status">"status"</a> command to just one line. This can
-be very useful with lots of multi-process services.</p>
+			<p>Often times you would like to run a certain service with X number of identical processes.
+			None of the supervision suites have any mechanism to allow this (none that I
+			know of at least), apart from creating identical copies of a service directory for every
+			process needed. While <strong>svsh</strong> can't help you with that, it provides a nice feature for collapsing
+			these identical services in the output of the <code>status</code> command to just one line. This can
+			be very useful with lots of multi-process services.</p>
 
-<p>Currently, <code>svsh</code> determines multi-process services if their names are postfixed with a dash
-and a number. For example, if you have a service called <code>worker</code> that you need 3 processes
-of which to run, you can create <code>worker-1</code>, <code>worker-2</code> and <code>worker-3</code> service directories.
-If the <a href="#c-collapse">collapse</a> option is on, <code>svsh</code> will collapse all of these into
-just one line, under the name <code>status</code>.</p>
+			<p>Currently, <strong>svsh</strong> determines multi-process services if their names are postfixed with a dash
+			and a number. For example, if you have a service called "worker" that you need 3 processes
+			of which to run, you can create "worker-1", "worker-2" and "worker-3" service directories.
+			If the <code>collapse</code> option is on, <strong>svsh</strong> will collapse all of these into
+			just one line, under the name status.</p>
 
-<pre><code>    svsh&gt; status
-       process |     status | duration |   pid
-      worker-1 |         up |    9813s | 25984
-      worker-2 |         up |    9813s | 25976
-      worker-3 |         up |    4393s | 2990
+			<div class="ui segment">
+				<pre>    svsh&gt; status
+<span style="background-color: #fff; color: #000">       process |     status | duration |   pid </span>
+      <strong>worker-1</strong> |         <span style="color: #00D918">up</span> |    9813s | 25984
+      <strong>worker-2</strong> |         <span style="color: #00D918">up</span> |    9813s | 25976
+      <strong>worker-3</strong> |         <span style="color: #00D918">up</span> |    4393s | 2990
 
     svsh&gt; toggle collapse
-       process |     status | duration |   pid
-        worker |       3 up |    9850s |     -
-</code></pre>
+<span style="background-color: #fff; color: #000">       process |     status | duration |   pid </span>
+        <strong>worker</strong> |       <span style="color: #00D918">3 up</span> |    9850s |     -</pre>
+			</div>
+		</div>
 
-<p>This feature combines well with the <a href="#wildcards">"WILDCARDS"</a> feature.</p>
-
-<p>Hopefully, future versions will find a more generic way of identifying multi-process services.</p>
-
-<h1>CONFIGURATION AND ENVIRONMENT</h1>
-
-<p><code>svsh</code> requires no configuration files or environment variables.</p>
-
-<h1>DEPENDENCIES</h1>
-
-<p><code>svsh</code> depends on the following modules:</p>
-
-<ul>
-<li><a href="https://metacpan.org/pod/Getopt::Compact">Getopt::Compact</a></li>
-<li><a href="https://metacpan.org/pod/Moo">Moo</a></li>
-<li><a href="https://metacpan.org/pod/namespace::clean">namespace::clean</a></li>
-<li><a href="https://metacpan.org/pod/Term::ANSIColor">Term::ANSIColor</a></li>
-<li><a href="https://metacpan.org/pod/Term::ShellUI">Term::ShellUI</a></li>
-</ul>
-
-<h1>INCOMPATIBILITIES</h1>
-
-<p>None reported.</p>
-
-<h1>BUGS AND LIMITATIONS</h1>
-
-<p>No bugs have been reported.</p>
-
-<p>Please report any bugs or feature requests to
-<code>bug-Svsh@rt.cpan.org</code>, or through the web interface at
-<a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh</a>.</p>
-
-<h1>AUTHOR</h1>
-
-<p>Ido Perlmuter <ido at ido50 dot net></p>
-
-<h1>LICENSE AND COPYRIGHT</h1>
-
-<p>Copyright (c) 2015, Ido Perlmuter <code>ido at ido50 dot net</code>.</p>
-
-<p>This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See <a href="https://metacpan.org/pod/perlartistic">perlartistic</a> 
-and <a href="https://metacpan.org/pod/perlgpl">perlgpl</a>.</p>
-
-<p>The full text of the license can be found in the
-LICENSE file included with this module.</p>
-
-<h1>DISCLAIMER OF WARRANTY</h1>
-
-<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
-
-<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.</p>
+		<div class="ui segment inverted footer">
+			<p>&copy;Copyrights, 2015 Ido Perlmuter.</p>
+		</div>
+	</body>
+</html>
