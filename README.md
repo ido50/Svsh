@@ -154,6 +154,24 @@ files  when the [fg](#fg-service) command is used. However, if the log file is b
 while it is being tailed, behavior is currently undefined (will probably stop working until
 the command is run again).
 
+## HISTORY
+
+`svsh` provides bash-like history so you can use your up arrow key to cycle back through
+past commands, or use `Ctrl+R` to search your history. The history file is saved under
+the name `.svsh_history` under the home directory of the running user (`~/.svsh_history`).
+
+Note that history is saved only when the shell is properly terminated, such as with the
+[quit](https://metacpan.org/pod/quit) command. `Ctrl+C` will not trigger history saving.
+
+It is highly recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu) for proper history support.
+
+## AUTOCOMPLETION
+
+`svsh` provides autocompletion for all its commands. Tap the tab key at any moment while
+typing in commands and arguments, and `svsh` will attempt to autocomplete your current
+word, or display a list if multiple options are available. Again, [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu)
+is recommended for better autocompletion.
+
 ## WILDCARDS
 
 `svsh` makes it easy to manipulate multiple services at once. Wildcards are supported
@@ -216,8 +234,12 @@ Hopefully, future versions will find a more generic way of identifying multi-pro
 - [Getopt::Compact](https://metacpan.org/pod/Getopt::Compact)
 - [Moo](https://metacpan.org/pod/Moo)
 - [namespace::clean](https://metacpan.org/pod/namespace::clean)
+- [Process::Killall](https://metacpan.org/pod/Process::Killall)
 - [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor)
 - [Term::ShellUI](https://metacpan.org/pod/Term::ShellUI)
+
+For proper history and autocompletion support, and generally a better
+working shell, it is recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu).
 
 # INCOMPATIBILITIES
 
@@ -259,8 +281,8 @@ You can also look for information at:
 
 Ido Perlmuter <ido at ido50 dot net>.
 
-Thanks to the guys at the [supervision mailing list](http://skarnet.org/lists.html#supervision)
-for helping out with suggestions.
+Thanks to the guys at the [supervision mailing list](http://skarnet.org/lists.html#supervision),
+especially Colin Booth, for helping out with suggestions and information.
 
 # LICENSE AND COPYRIGHT
 

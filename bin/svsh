@@ -178,6 +178,9 @@ C<svsh> provides bash-like history so you can use your up arrow key to cycle bac
 past commands, or use C<Ctrl+R> to search your history. The history file is saved under
 the name C<.svsh_history> under the home directory of the running user (C<~/.svsh_history>).
 
+Note that history is saved only when the shell is properly terminated, such as with the
+L<quit> command. C<Ctrl+C> will not trigger history saving.
+
 It is highly recommended to install L<Term::ReadLine::Gnu> for proper history support.
 
 =head2 AUTOCOMPLETION
@@ -518,8 +521,8 @@ L<http://search.cpan.org/dist/Svsh/>
 
 Ido Perlmuter <ido at ido50 dot net>.
 
-Thanks to the guys at the L<supervision mailing list|http://skarnet.org/lists.html#supervision>
-for helping out with suggestions.
+Thanks to the guys at the L<supervision mailing list|http://skarnet.org/lists.html#supervision>,
+especially Colin Booth, for helping out with suggestions and information.
 
 =head1 LICENSE AND COPYRIGHT
 
