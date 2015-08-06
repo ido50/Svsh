@@ -35,7 +35,7 @@
 				Get Started
 			</a>
 			<div class="ui label">
-				latest version: 1.0.0
+				latest version: 1.1.0
 			</div>
 		</div>
 
@@ -44,7 +44,7 @@
 
 			<p><strong>svsh</strong> is a free software command line shell for process supervision suites of the daemontools family. Currently, it supports <a href="http://cr.yp.to/daemontools.html" rel="external">daemontools</a>, <a href="http://b0llix.net/perp/" rel="external">perp</a>, <a href="http://www.skarnet.org/software/s6/index.html" rel="external">s6</a> and <a href="http://smarden.org/runit/" rel="external">runit</a>. It provides a unified interface allowing easy inspection and manipulation of services (i.e. processes) managed by these suites.</p>
 
-			<p>With <strong>svsh</strong>, it is easy to get a complete view of your processes and their statuses. You can bring processes up, down, send them signals and view their output in real time. You don't need to remember the particular syntax of the control tools provided by your suite. Instead,</p>
+			<p>With <strong>svsh</strong>, it is easy to get a complete view of your processes and their statuses. You can bring processes up, down, send them signals and view their output in real time. You don't need to remember the particular syntax of the control tools provided by your suite. Instead, you get a natural syntax that's easy to remember. Why execute <code>perpctl -b /services q nginx</code> when you can just type <code>restart nginx</code>?</p>
 
 			<p><strong>svsh</strong> is written in Perl and currently targets UNIX-like operating systems that use procfs.</p>
 		</div>
@@ -65,7 +65,7 @@
 			</div>
 
 			<h2>building manually:</h2>
-			<p><a href="https://metacpan.org/pod/distribution/Svsh/bin/svsh" rel="external">Download the tarball</a>, extract it, and build with:</p>
+			<p><a href="https://cpan.metacpan.org/authors/id/I/ID/IDOPEREL/Svsh-1.001000.tar.gz" rel="external">Download the tarball</a>, extract it, and build with:</p>
 			<div class="ui segment">
 				<p>$ perl Makefile.PL<br />$ make && make test<br />$ sudo make install</p>
 			</div>
@@ -157,6 +157,14 @@ svsh></pre>
 			file descriptor used by that process under <strong>/proc/&lt;pid&gt;/fd</strong>. As long as your services
 			are being logged by one of these tools, svsh <em>should</em> be able to tail their log
 			files when the fg command is used.</p>
+
+			<h2>History and Auto-Completion</h2>
+
+			<p><strong>svsh</strong> provides bash-like history so you can use your up arrow key to cycle back through past commands, or use Ctrl+R to search your history. The history file is saved under ~/.svsh_history.</p>
+
+			<p>Also, autocompletion is provided for all commands. Tap the tab key at any moment while typing in commands and arguments, and <strong>svsh</strong> will attempt to autocomplete your current word, or display a list if multiple options are available.</p>
+
+			<p>For this to work best, it is recommended to install <a href="https://metacpan.org/pod/Term::ReadLine::Gnu" rel="external">Term::ReadLine::Gnu</a>.
 
 			<h2>Wildcards</h2>
 
