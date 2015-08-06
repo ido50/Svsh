@@ -117,7 +117,7 @@ sub rescan {
 =cut
 
 sub terminate {
-	$_[0]->run_cmd('s6-svscanctl', '-7', $_[0]->basedir);
+	$_[0]->run_cmd('s6-svscanctl', '-t', $_[0]->basedir);
 }
 
 =head1 BUGS AND LIMITATIONS
