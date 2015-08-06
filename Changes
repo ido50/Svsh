@@ -1,6 +1,8 @@
 Revision history for Svsh
 
 {{$NEXT}}
+
+1.001000  2015-08-06 22:21:11+03:00 Asia/Jerusalem
 	- Add history_file usage for bash-like history
 	- Add autocompletion to all argument taking commands
 	- Add Term::ReadLine::Gnu recommendation (for better history/autocomplete)
