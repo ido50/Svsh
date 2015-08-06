@@ -172,6 +172,21 @@ files  when the L<fg|/"fg service"> command is used. However, if the log file is
 while it is being tailed, behavior is currently undefined (will probably stop working until
 the command is run again).
 
+=head2 HISTORY
+
+C<svsh> provides bash-like history so you can use your up arrow key to cycle back through
+past commands, or use C<Ctrl+R> to search your history. The history file is saved under
+the name C<.svsh_history> under the home directory of the running user (C<~/.svsh_history>).
+
+It is highly recommended to install L<Term::ReadLine::Gnu> for proper history support.
+
+=head2 AUTOCOMPLETION
+
+C<svsh> provides autocompletion for all its commands. Tap the tab key at any moment while
+typing in commands and arguments, and C<svsh> will attempt to autocomplete your current
+word, or display a list if multiple options are available. Again, L<Term::ReadLine::Gnu>
+is recommended for better autocompletion.
+
 =head2 WILDCARDS
 
 C<svsh> makes it easy to manipulate multiple services at once. Wildcards are supported
@@ -396,8 +411,10 @@ my $term = Term::ShellUI->new(
 		},
 		exit => { alias => 'quit' }
 	},
-	prompt => 'svsh> '
+	prompt => 'svsh> ',
+	history_file => '~/.svsh_history'
 );
+
 if (scalar @ARGV) {
 	$term->process_a_cmd(join(' ', @ARGV));
 } else {
@@ -446,11 +463,16 @@ C<svsh> depends on the following modules:
 
 =item * L<namespace::clean>
 
+=item * L<Process::Killall>
+
 =item * L<Term::ANSIColor>
 
 =item * L<Term::ShellUI>
 
 =back
+
+For proper history and autocompletion support, and generally a better
+working shell, it is recommended to install L<Term::ReadLine::Gnu>.
 
 =head1 INCOMPATIBILITIES
 
