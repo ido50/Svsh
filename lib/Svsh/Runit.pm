@@ -3,6 +3,8 @@ package Svsh::Runit;
 use Moo;
 use namespace::clean;
 
+use Proc::Killall;
+
 with 'Svsh';
 
 =head1 NAME
@@ -101,6 +103,15 @@ sub fg {
 		|| die "Can't find out process' log file";
 
 	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
+}
+
+=head2 terminate()
+
+=cut
+
+sub terminate {
+	my $basedir = $_[0]->basedir;
+	killall('HUP', "runsvdir $basedir");
 }
 
 =head1 BUGS AND LIMITATIONS
