@@ -16,3 +16,5 @@
 ^Svsh-.*$
 ^\.build.*$
 ^MYMETA\..*$
+^node_modules$
+^semantic$

@@ -15,3 +15,5 @@ cover_db
 pod2htm*.tmp
 Svsh-*
 .build*
+node_modules
+semantic
