@@ -248,6 +248,26 @@ die $@
 
 my $svsh = $class->new(%$opts);
 
+sub service_grep {
+	my $names = [sort keys %{$svsh->statuses}];
+	if (scalar @{$_[1]->{args}} && $_[1]->{args}->[-1]) {
+		return [grep { m/^$_[1]->{args}->[-1]/ } @$names];
+	} else {
+		return $names;
+	}
+}
+
+sub signal_grep {
+	if (scalar @{$_[1]->{args}} < 2) {
+		# user hasn't completed signal yet, so we're returning signals here
+		my $sigs = [qw/HUP INT QUIT KILL USR1 USR2 ALRM TERM CONT WINCH/];
+		return $_[1]->{args}->[0] ? [grep { m/^$_[1]->{args}->[0]/i } @$sigs] : $sigs;
+	} else {
+		# user has already completed signal, so we're returning services here
+		return service_grep(@_);
+	}
+}
+
 my $term = Term::ShellUI->new(
 	commands => {
 		status => {
@@ -312,21 +332,25 @@ my $term = Term::ShellUI->new(
 		start => {
 			desc => 'Starts a list of processes',
 			minargs => 1,
+			args => \&service_grep,
 			method => sub { print $svsh->start(@_) }
 		},
 		stop => {
 			desc => 'Stops a list of running processes',
 			minargs => 1,
+			args => \&service_grep,
 			method => sub { print $svsh->stop(@_) }
 		},
 		restart => {
 			desc => 'Restarts a list of processes',
 			minargs => 1,
+			args => \&service_grep,
 			method => sub { print $svsh->restart(@_) }
 		},
 		signal => {
 			desc => 'Sends a signal to a list of processes',
 			minargs => 2,
+			args => \&signal_grep,
 			method => sub { print $svsh->signal(@_) }
 		},
 		rescan => {
@@ -345,6 +369,7 @@ my $term = Term::ShellUI->new(
 			desc => 'Move a process to the foreground',
 			minargs => 1,
 			maxargs => 1,
+			args => \&service_grep,
 			method => sub { $svsh->fg(@_) }
 		},
 		terminate => {
