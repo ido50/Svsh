@@ -3,6 +3,8 @@ package Svsh::Daemontools;
 use Moo;
 use namespace::clean;
 
+our $DEFAULT_BASEDIR = '/service';
+
 with 'Svsh';
 
 =head1 NAME
@@ -13,6 +15,11 @@ Svsh::Daemontools - daemontools support for svsh
 
 This class provides support for L<daemontools|http://cr.yp.to/daemontools.html>
 to L<svsh> - the supervisor shell.
+
+=head2 DEFAULT BASE DIRECTORY
+
+C<daemontools> uses C</service> as its default base directory. If a base directory
+is not provided to C<svsh>, that is what will be used.
 
 =head1 IMPLEMENTED METHODS
 

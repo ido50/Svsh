@@ -5,6 +5,8 @@ use namespace::clean;
 
 use Proc::Killall;
 
+our $DEFAULT_BASEDIR = -e '/etc/service' ? '/etc/service' : '/service';
+
 with 'Svsh';
 
 =head1 NAME
@@ -15,6 +17,14 @@ Svsh::Runit - runit support for svsh
 
 This class provides support for L<runit|http://smarden.org/runit/>
 to L<svsh> - the supervisor shell.
+
+=head2 DEFAULT BASE DIRECTORY
+
+Traditionally, C<runit> used C</etc/service> as the default base directory,
+but versions 1.9.0 changed the default to C</service>. C<runit> still recommends
+C</etc/service> for FHS compliant systems, so this class uses C</etc/service>
+if it exists, or C</service> otherwise, if a base directory is not provided
+to C<svsh>.
 
 =head1 IMPLEMENTED METHODS
 

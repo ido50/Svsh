@@ -1,6 +1,11 @@
 Revision history for Svsh
 
 {{$NEXT}}
+	- The --suite and --basedir options are no longer required. If --suite
+	  does not exist, the SVSH_SUITE environment variable is checked. If --basedir
+	  does not exist, the SVSH_BASE environment variable is checked, and if not,
+	  the default directory for the specific suite is used (see the suite's class
+	  for its default directory).
 
 1.001000  2015-08-06 22:21:11+03:00 Asia/Jerusalem
 	- Add history_file usage for bash-like history

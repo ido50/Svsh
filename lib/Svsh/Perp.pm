@@ -3,6 +3,8 @@ package Svsh::Perp;
 use Moo;
 use namespace::clean;
 
+our $DEFAULT_BASEDIR = $ENV{PERP_BASE} || '/etc/perp';
+
 with 'Svsh';
 
 =head1 NAME
@@ -13,6 +15,13 @@ Svsh::Perp - perp support for svsh
 
 This class provides support for L<perp|http://b0llix.net/perp/>
 to L<svsh> - the supervisor shell.
+
+=head2 DEFAULT BASE DIRECTORY
+
+As per the L<perpboot|http://b0llix.net/perp/site.cgi?page=perpboot.8> documentation,
+C<perp> does not have a default base directory, but will check if a C<PERP_BASE> environment
+variable is set, and if not, will try C</etc/perp>. This class will do the same if
+a base directory is not provided to C<svsh>.
 
 =head1 IMPLEMENTED METHODS
 

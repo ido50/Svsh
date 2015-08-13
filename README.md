@@ -34,14 +34,19 @@ attempted to provide a similar syntax and feature set.
 
 # OPTIONS
 
-## -d, --basedir
-
-_Required_. Base directory of services supervised by the supervision suite.
-
 ## -s, --suite
 
-_Required_. The supervision suite managing the base directory. Either `daemontools`, `perp`,
-`s6` or `runit`.
+The supervision suite managing the base directory. Either `daemontools`, `perp`,
+`s6` or `runit`. If not provided, the `SVSH_SUITE` environment variable will
+be checked. An error will be raised if no suite is defined.
+
+## -d, --basedir
+
+Base directory of services supervised by the supervision suite. If not provided,
+the `SVSH_BASE` environment variable will be checked, and if not set, the default
+base directory of the selected suite will be used. Check the documentation of
+the specific suite class for its default directory. If no directory is found,
+an error will be raised.
 
 ## -b, --bindir
 

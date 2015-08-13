@@ -3,6 +3,8 @@ package Svsh::S6;
 use Moo;
 use namespace::clean;
 
+our $DEFAULT_BASEDIR = '/service';
+
 with 'Svsh';
 
 =head1 NAME
@@ -13,6 +15,11 @@ Svsh::S6 - s6 support for svsh
 
 This class provides support for L<s6|http://www.skarnet.org/software/s6/>
 to L<svsh> - the supervisor shell.
+
+=head2 DEFAULT BASE DIRECTORY
+
+C<s6> does not have a default base directory, but recommends C</service>,
+so that is what will be used if a base directory was not provided to C<svsh>.
 
 =head1 IMPLEMENTED METHODS
 

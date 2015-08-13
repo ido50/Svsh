@@ -52,14 +52,19 @@ attempted to provide a similar syntax and feature set.
 
 =head1 OPTIONS
 
-=head2 -d, --basedir
-
-I<Required>. Base directory of services supervised by the supervision suite.
-
 =head2 -s, --suite
 
-I<Required>. The supervision suite managing the base directory. Either C<daemontools>, C<perp>,
-C<s6> or C<runit>.
+The supervision suite managing the base directory. Either C<daemontools>, C<perp>,
+C<s6> or C<runit>. If not provided, the C<SVSH_SUITE> environment variable will
+be checked. An error will be raised if no suite is defined.
+
+=head2 -d, --basedir
+
+Base directory of services supervised by the supervision suite. If not provided,
+the C<SVSH_BASE> environment variable will be checked, and if not set, the default
+base directory of the selected suite will be used. Check the documentation of
+the specific suite class for its default directory. If no directory is found,
+an error will be raised.
 
 =head2 -b, --bindir
 
@@ -254,38 +259,31 @@ my $go = Getopt::Compact->new(
 );
 my $opts = $go->opts;
 
+# if a suite is not provided, check the SVSH_SUITE environment
+# variable
+$opts->{suite} ||= $ENV{SVSH_SUITE};
+
+# check the selected suite is valid
 _check_suite($opts->{suite});
+
+# load the adapter class for the suite
+my $class = 'Svsh::'.ucfirst($opts->{suite});
+eval "require $class";
+die $@ if $@;
+
+# if a base directory was not defined, guess it
+{
+	no strict 'refs';
+	$opts->{basedir} ||= $ENV{SVSH_BASE} || ${"${class}::DEFAULT_BASEDIR"};
+}
+
+# make sure the base directory exists
 _check_basedir($opts->{basedir});
 
-my $class = 'Svsh::'.ucfirst($opts->{suite});
-
-eval "require $class";
-
-die $@
-	if $@;
-
+# create a new instance of the adapter class
 my $svsh = $class->new(%$opts);
 
-sub service_grep {
-	my $names = [sort keys %{$svsh->statuses}];
-	if (scalar @{$_[1]->{args}} && $_[1]->{args}->[-1]) {
-		return [grep { m/^$_[1]->{args}->[-1]/ } @$names];
-	} else {
-		return $names;
-	}
-}
-
-sub signal_grep {
-	if (scalar @{$_[1]->{args}} < 2) {
-		# user hasn't completed signal yet, so we're returning signals here
-		my $sigs = [qw/HUP INT QUIT KILL USR1 USR2 ALRM TERM CONT WINCH/];
-		return $_[1]->{args}->[0] ? [grep { m/^$_[1]->{args}->[0]/i } @$sigs] : $sigs;
-	} else {
-		# user has already completed signal, so we're returning services here
-		return service_grep(@_);
-	}
-}
-
+# configure the shell
 my $term = Term::ShellUI->new(
 	commands => {
 		status => {
@@ -350,25 +348,25 @@ my $term = Term::ShellUI->new(
 		start => {
 			desc => 'Starts a list of processes',
 			minargs => 1,
-			args => \&service_grep,
+			args => \&_service_grep,
 			method => sub { print $svsh->start(@_) }
 		},
 		stop => {
 			desc => 'Stops a list of running processes',
 			minargs => 1,
-			args => \&service_grep,
+			args => \&_service_grep,
 			method => sub { print $svsh->stop(@_) }
 		},
 		restart => {
 			desc => 'Restarts a list of processes',
 			minargs => 1,
-			args => \&service_grep,
+			args => \&_service_grep,
 			method => sub { print $svsh->restart(@_) }
 		},
 		signal => {
 			desc => 'Sends a signal to a list of processes',
 			minargs => 2,
-			args => \&signal_grep,
+			args => \&_signal_grep,
 			method => sub { print $svsh->signal(@_) }
 		},
 		rescan => {
@@ -387,7 +385,7 @@ my $term = Term::ShellUI->new(
 			desc => 'Move a process to the foreground',
 			minargs => 1,
 			maxargs => 1,
-			args => \&service_grep,
+			args => \&_service_grep,
 			method => sub { $svsh->fg(@_) }
 		},
 		terminate => {
@@ -414,15 +412,37 @@ my $term = Term::ShellUI->new(
 		},
 		exit => { alias => 'quit' }
 	},
-	prompt => 'svsh> ',
+	prompt => $svsh->basedir.'> ',
 	history_file => '~/.svsh_history'
 );
 
+# if a command was supplied as arguments, just run it,
+# otherwise invoke the status command and run the shell
 if (scalar @ARGV) {
 	$term->process_a_cmd(join(' ', @ARGV));
 } else {
 	$term->process_a_cmd('status');
 	$term->run;
+}
+
+sub _service_grep {
+	my $names = [sort keys %{$svsh->statuses}];
+	if (scalar @{$_[1]->{args}} && $_[1]->{args}->[-1]) {
+		return [grep { m/^$_[1]->{args}->[-1]/ } @$names];
+	} else {
+		return $names;
+	}
+}
+
+sub _signal_grep {
+	if (scalar @{$_[1]->{args}} < 2) {
+		# user hasn't completed signal yet, so we're returning signals here
+		my $sigs = [qw/HUP INT QUIT KILL USR1 USR2 ALRM TERM CONT WINCH/];
+		return $_[1]->{args}->[0] ? [grep { m/^$_[1]->{args}->[0]/i } @$sigs] : $sigs;
+	} else {
+		# user has already completed signal, so we're returning services here
+		return _service_grep(@_);
+	}
 }
 
 sub _check_suite {
@@ -431,7 +451,7 @@ sub _check_suite {
 	$suite
 		|| _error('Suite not provided');
 	$suite =~ m/^(perp|s6|runit|daemontools)$/
-		|| _error('Suite must be perp, s6 or runit');
+		|| _error('Suite must be perp, s6, runit or daemontools');
 }
 
 sub _check_basedir {
@@ -440,7 +460,10 @@ sub _check_basedir {
 	$basedir
 		|| _error('Base directory not provided');
 	-e $basedir && -d $basedir
-		|| error('Base directory does not exist or is not a directory');
+		|| _error("Base directory $basedir does not exist or is not a directory");
+
+	print "Base directory: $basedir\n"
+		if $ENV{SVSH_VERBOSE};
 }
 
 sub _error {
