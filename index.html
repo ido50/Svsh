@@ -39,7 +39,7 @@
 				Get Started
 			</a>
 			<div class="ui label">
-				latest version: 1.1.0
+				latest version: 1.2.0
 			</div>
 		</div>
 
@@ -48,7 +48,7 @@
 
 			<p><strong>svsh</strong> is a command line shell for process supervision suites of the daemontools family. Currently, it supports <a href="http://cr.yp.to/daemontools.html" rel="external">daemontools</a>, <a href="http://b0llix.net/perp/" rel="external">perp</a>, <a href="http://www.skarnet.org/software/s6/index.html" rel="external">s6</a> and <a href="http://smarden.org/runit/" rel="external">runit</a>. It provides a unified interface allowing easy inspection and manipulation of services (i.e. processes) managed by these supervisors.</p>
 
-			<p>If you are unfamiliar with process supervision suites, here's the gist: they manage a set of processes, making sure they are all up, and attempt to bring them up if they ever go down. Some of them are designed to run as a system's init process, i.e. process 1, thus providing an alternative to System V, systemd and others. They all provide a set of command line utilities that allow to launch processes in certain ways (such as with resouce limits), and to manipulate them once running. They are considered a "family", since they provide mostly the same utilities, and their configuration is mostly compatible. They are different from other inits and supervisors (like supervisord), not only in this structure, but in other key respects. The <a href="http://www.skarnet.org/software/s6/why.html" rel="external">s6 website</a> has a good document explaning these differences. <strong>svsh</strong> is not a supervisor in itself, but an external tool for interacting with these supervisors in a cleaner, easier way.</p>
+			<p><strong>svsh</strong> is not a supervisor in itself, but an external tool for interacting with existing process supervision suites. If you are unfamiliar with these suites, here's the gist: they manage a set of processes, making sure they are all up, and attempt to bring them up if they ever go down. Some of them are designed to run as a system's init process, i.e. process 1, thus providing an alternative to System V, systemd and others. They all provide a set of command line utilities that allow to launch processes in certain ways (such as with resouce limits), and to manipulate them once running. They are considered a "family", since they provide mostly the same utilities, and their configuration is mostly compatible. They are different from other inits and supervisors (like supervisord), not only in this structure, but in other key respects. An excellent <a href="http://www.skarnet.org/software/s6/overview.html" rel="external">overview of supervision suites</a> and <a href="http://www.skarnet.org/software/s6/why.html" rel="external">differences from traditional supervisors</a> are posted on the s6 website.</p>
 
 			<p>With <strong>svsh</strong>, it is easy to get a complete view of your processes and their statuses. You can bring processes up, down, send them signals and view their output in real time. You don't need to remember the particular syntax of the control tools provided by your suite. Instead, you get a natural syntax that's easy to remember. Why execute <code>perpctl -b /services q nginx</code> when you can just type <code>restart nginx</code>?</p>
 
@@ -71,7 +71,7 @@
 			</div>
 
 			<h2>building manually:</h2>
-			<p><a href="https://cpan.metacpan.org/authors/id/I/ID/IDOPEREL/Svsh-1.001000.tar.gz" rel="external">Download the tarball</a>, extract it, and build with:</p>
+			<p><a href="https://cpan.metacpan.org/authors/id/I/ID/IDOPEREL/Svsh-1.002000.tar.gz" rel="external">Download the tarball</a>, extract it, and build with:</p>
 			<div class="ui segment">
 				<p>$ perl Makefile.PL<br />$ make && make test<br />$ sudo make install</p>
 			</div>
