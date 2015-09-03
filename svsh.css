@@ -18,6 +18,9 @@ body {
 .ui.menu.top .item {
 	color: #fff;
 }
+.github-fork-ribbon-wrapper {
+	top: 48px;
+}
 .container {
 	background-color: #E0E4CC;
 	padding: 1em;
