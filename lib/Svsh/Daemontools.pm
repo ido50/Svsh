@@ -110,78 +110,31 @@ sub fg {
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
 Please report any bugs or feature requests to
-C<bug-Svsh@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh>.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-	perldoc Svsh::Daemontools
-
-You can also look for information at:
-
-=over 4
- 
-=item * RT: CPAN's request tracker
- 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Svsh>
- 
-=item * AnnoCPAN: Annotated CPAN documentation
- 
-L<http://annocpan.org/dist/Svsh>
- 
-=item * CPAN Ratings
- 
-L<http://cpanratings.perl.org/d/Svsh>
- 
-=item * Search CPAN
- 
-L<http://search.cpan.org/dist/Svsh/>
- 
-=back
+L<https://github.com/ido50/Svsh/issues>.
 
 =head1 AUTHOR
 
-Ido Perlmuter <ido at ido50 dot net>
+Ido Perlmuter <ido@ido50.net>
+
+Thanks to the guys at the L<supervision mailing list|http://skarnet.org/lists.html#supervision>,
+especially Colin Booth, for helping out with suggestions and information.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2015, Ido Perlmuter C<< ido at ido50 dot net >>.
+Copyright (c) 2015-2023, Ido Perlmuter C<< ido@ido50.net >>.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See L<perlartistic|perlartistic> 
-and L<perlgpl|perlgpl>.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 =cut
 

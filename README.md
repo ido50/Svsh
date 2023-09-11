@@ -4,11 +4,19 @@ svsh - Process supervision shell for daemontools/perp/s6/runit
 
 # SYNOPSIS
 
-        # from the command line
-        $ svsh --suite perp --basedir /etc/services
+svsh \[OPTIONS\]
 
-        # run one specific command and exit
-        $ svsh --suite runit --basedir /var/services restart nginx
+Options:
+
+    --basedir=BASEDIR (-d)   Service directory (on which supervisor was started).
+    --suite=SUITE     (-s)   Supervision suite managing the directory (perp, s6 or runit).
+    --bindir=BINDIR   (-b)   Directory where the supervisor is installed (e.g. /usr/sbin). Optional.
+    --collapse        (-c)   Collapse numbered services into one line.
+
+Example:
+
+    svsh --suite perp --basedir /etc/services
+    svsh --suite runit --basedir /var/services restart nginx
 
 # DESCRIPTION
 
@@ -168,13 +176,13 @@ the name `.svsh_history` under the home directory of the running user (`~/.svsh_
 Note that history is saved only when the shell is properly terminated, such as with the
 [quit](https://metacpan.org/pod/quit) command. `Ctrl+C` will not trigger history saving.
 
-It is highly recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu) for proper history support.
+It is highly recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term%3A%3AReadLine%3A%3AGnu) for proper history support.
 
 ## AUTOCOMPLETION
 
 `svsh` provides autocompletion for all its commands. Tap the tab key at any moment while
 typing in commands and arguments, and `svsh` will attempt to autocomplete your current
-word, or display a list if multiple options are available. Again, [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu)
+word, or display a list if multiple options are available. Again, [Term::ReadLine::Gnu](https://metacpan.org/pod/Term%3A%3AReadLine%3A%3AGnu)
 is recommended for better autocompletion.
 
 ## WILDCARDS
@@ -236,90 +244,38 @@ Hopefully, future versions will find a more generic way of identifying multi-pro
 
 `svsh` depends on the following modules:
 
-- [Getopt::Compact](https://metacpan.org/pod/Getopt::Compact)
 - [Moo](https://metacpan.org/pod/Moo)
-- [namespace::clean](https://metacpan.org/pod/namespace::clean)
-- [Process::Killall](https://metacpan.org/pod/Process::Killall)
-- [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor)
-- [Term::ShellUI](https://metacpan.org/pod/Term::ShellUI)
+- [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean)
+- [Proc::Killall](https://metacpan.org/pod/Proc%3A%3AKillall)
+- [Term::ShellUI](https://metacpan.org/pod/Term%3A%3AShellUI)
 
 For proper history and autocompletion support, and generally a better
-working shell, it is recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu).
-
-# INCOMPATIBILITIES
-
-None reported.
+working shell, it is recommended to install [Term::ReadLine::Gnu](https://metacpan.org/pod/Term%3A%3AReadLine%3A%3AGnu).
 
 # BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
 Please report any bugs or feature requests to
-`bug-Svsh@rt.cpan.org`, or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Svsh).
-
-# SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-        perldoc svsh
-
-You can also look for information at:
-
-- RT: CPAN's request tracker
-
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Svsh](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Svsh)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/Svsh](http://annocpan.org/dist/Svsh)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Svsh](http://cpanratings.perl.org/d/Svsh)
-
-- Search CPAN
-
-    [http://search.cpan.org/dist/Svsh/](http://search.cpan.org/dist/Svsh/)
+[https://github.com/ido50/Svsh/issues](https://github.com/ido50/Svsh/issues).
 
 # AUTHOR
 
-Ido Perlmuter <ido at ido50 dot net>.
+Ido Perlmuter <ido@ido50.net>
 
 Thanks to the guys at the [supervision mailing list](http://skarnet.org/lists.html#supervision),
 especially Colin Booth, for helping out with suggestions and information.
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2015, Ido Perlmuter `ido at ido50 dot net`.
+Copyright (c) 2015-2023, Ido Perlmuter `ido@ido50.net`.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See [perlartistic](https://metacpan.org/pod/perlartistic) 
-and [perlgpl](https://metacpan.org/pod/perlgpl).
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-# DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

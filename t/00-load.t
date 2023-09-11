@@ -2,12 +2,10 @@
 
 use Test::More tests => 5;
 
-BEGIN {
-	use_ok('Svsh') || print "Bail out Svsh!\n";
-	use_ok('Svsh::Perp') || print "Bail out Svsh::Perp!\n";
-	use_ok('Svsh::S6') || print "Bail out Svsh::S6!\n";
-	use_ok('Svsh::Runit') || print "Bail out Svsh::Runit!\n";
-	use_ok('Svsh::Daemontools') || print "Bail out Svsh::Daemontools!\n";
-}
+use ok('Svsh');
+use ok('Svsh::Perp');
+use ok('Svsh::S6');
+use ok('Svsh::Runit');
+use ok('Svsh::Daemontools');
 
 diag("Testing Svsh $Svsh::VERSION, Perl $], $^X");

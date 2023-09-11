@@ -1,6 +1,8 @@
 Revision history for Svsh
 
 {{$NEXT}}
+    - Replace Getopt::Compact with core module Getopt::Long
+    - Switch license to Apache 2.0
 
 1.002000  2015-08-13 21:16:42+03:00 Asia/Jerusalem
 	- The --suite and --basedir options are no longer required. If --suite
