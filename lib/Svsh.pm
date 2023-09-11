@@ -1,201 +1,209 @@
 package Svsh;
 
-# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
-
 our $VERSION = "1.003000";
 $VERSION = eval $VERSION;
 
-use Moo::Role;
+use warnings;
+use strict;
+
+use Carp;
+use IPC::Cmd qw/run/;
 
 =head1 NAME
 
-Svsh - Process supervision shell for daemontools/perp/s6/runit (base class)
+Svsh - Process supervision shell for daemontools/perp/s6/runit (library)
 
 =head1 SYNOPSIS
 
-	package Svsh::SomeSupervisor;
+    use Svsh;
 
-	use Moo;
-	use namespace::clean;
+    my $svsh = Svsh->new('Perp', '/var/run/services');
 
-	with 'Svsh';
-
-	# implement required methods
+    $svsh->restart('web-server');
 
 =head1 DESCRIPTION
 
 C<svsh> is a shell for process supervision suites of the C<daemontools> family,
 including C<perp>, C<s6> and C<runit>. Refer to L<svsh> for documentation of
-the shell itself. This file documents the base class for Svsh adapter classes.
+the shell itself. This file documents the library backing the command line
+shell, and how to add support for other process supervisors.
 
-=head1 ATTRIBUTES
+=head1 CONSTRUCTOR
 
-=head2 basedir
+=head2 new( $suite, $basedir, \%opts )
 
-I<Required, Read-Only>.
+Creates a new Svsh instance.
 
-The base directory from which the process supervisor is managing services.
+C<$suite> is the class of the supervision suite. Svsh supports 'Daemontools',
+'Perp', 'Runit', and 'S6' out of the box, but custom classes can also be
+provided. When using one of the official supervision classes, the C<Svsh::>
+prefix may be omitted.
 
-=cut
+C<$basedir> is the base directory from which the process supervisor is managing
+services. If not provided, the default directory for the selected suite is used.
 
-has 'basedir' => (
-	is => 'ro',
-	required => 1
-);
-
-=head2 bindir
-
-I<Read-Only>.
-
-The directory where the process supervisor's tools are located. Any call to
-the supervisor's tools will be prefixed with this path if provided. For usage
-in case the tools are not in the running user's C<PATH> environment variable.
+C<\%opts> is an optional hash-ref of options that customize Svsh's behavior.
+The only option currently supported is "collapse", a boolean option indicating
+to L<collapse|svsh/"COLLAPSE"> services when displaying status.
 
 =cut
 
-has 'bindir' => (
-	is => 'ro'
-);
+sub new {
+    my ($class, $suite, $basedir, $opts) = @_;
 
-=head2 collapse
+    if (!$suite) {
+        confess "The suite class must be provided";
+    }
 
-I<Read-Write>.
+    if (!$basedir) {
+        confess "The base directory must be provided";
+    }
 
-A boolean indicating whether the L<collapse|svsh/"COLLAPSE"> option should be
-enabled.
+    if ($suite eq 'Daemontools' || $suite eq 'Perp' || $suite eq 'Runit' || $suite eq 'S6') {
+        $suite = "Svsh::$suite";
+    }
+
+    eval "require $suite";
+    croak $@ if @_;
+
+	-e $basedir && -d $basedir
+		|| confess("Base directory $basedir does not exist or is not a directory");
+
+    $opts ||= {};
+    $opts->{suite} = $suite;
+    $opts->{basedir} = $basedir || $suite->default_basedir;
+
+    return bless $opts, $class;
+}
+
+=head1 METHODS
+
+=head2 suite()
+
+Returns the name of the supervisor class.
 
 =cut
 
-has 'collapse' => (
-	is => 'rw',
-	default => sub { 0 }
-);
+sub suite {
+    my $self = shift;
 
-=head2 statuses
+    return $self->{suite};
+}
 
-I<Read-Only>.
+=head2 basedir()
 
-A hash-ref of services and their statuses (this is automatically populated by
-the respective C<status()> method in the adapter classes. For every service,
-a hash-ref with C<status>, C<duration> and C<pid> keys should exist.
+Returns the base directory from which the process supervisor is managing
+services.
 
 =cut
 
-has 'statuses' => (
-	is => 'ro',
-	writer => '_set_statuses'
-);
+sub basedir {
+    my $self = shift;
 
-=head1 REQUIRED METHODS
+    return $self->{basedir};
+}
+
+=head2 collapse()
+
+Returns a boolean value indicating whether the L<collapse|svsh/"COLLAPSE">
+option is enabled.
+
+=cut
+
+sub collapse {
+    my $self = shift;
+
+    return $self->{collapse} || 0;
+}
+
+sub $self->_call_suite_method {
+    my ($self, $desc, $method, @args) = @_;
+
+    eval {
+        if (!defined &{"${self->suite}::$method"}) {
+            croak "${self->suite} doesn't implement $method";
+        }
+
+        return &{"${self->suite}::$method"}(@args);
+    };
+
+    if ($@) {
+        croak "Failed ${desc}: $@";
+    }
+}
 
 =head2 status()
 
-Finds all services managed by the supervisor, and populates
-the L<statuses> attribute.
+Finds all services managed by the supervisor and returns their statuses.
+
+=cut
+
+sub status {
+    my $self = shift;
+    return $self->_call_suite_method('running status', 'status', $self->basedir);
+}
 
 =head2 start( @services )
 
 Starts a list of services if they are down.
 
+=cut
+
+sub start {
+    my ($self, @services) = @_;
+    return $self->_call_suite_method('starting services', 'start', $self->basedir, @services);
+}
+
 =head2 stop( @services )
 
 Stops a list of services (should not restart them).
 
+=cut
+
+sub stop {
+    my ($self, @services) = @_;
+    return $self->_call_suite_method('stopping services', 'stop', $self->basedir, @services);
+}
+
 =head2 restart( @services )
 
-Stops and starts a list of services. Generally, this is implemented
-with a C<QUIT> signal to the services, but check with the specific
-adapter class.
+Stops and starts a list of services. Generally, this is implemented with a
+C<QUIT> signal to the services, but check with the specific adapter class.
+
+=cut
+
+sub restart {
+    my ($self, @services) = @_;
+    return $self->_call_suite_method('restarting services', 'restart', $self->basedir, @services);
+}
 
 =head2 signal( $signal, @services )
 
-Sends UNIX signal to a list of services.
+Sends a UNIX signal to a list of services.
+
+=cut
+
+sub signal {
+    my ($self, $signal, @services) = @_;
+    return $self->_call_suite_method('signalling services', 'signal', $self->basedir, $signal, @services);
+}
 
 =head2 fg( $service )
 
-Finds the log file to which a service is writing, and displays it
-on screen with the C<tail -f> command.
-
-=head1 WANTED METHODS
-
-These methods are not required by adapter classes. If they are not
-implemented, they will be unavailable in the shell.
-
-=head2 rescan()
-
-Causes the supervisor to rescan the service directory to find
-new or removed services.
-
-=head2 terminate()
-
-Terminates the supervisor. Should also terminate all running services.
+Finds the log file to which a service is writing, and displays it on screen with
+the C<tail -f> command.
 
 =cut
 
-requires qw/status start stop restart signal fg/;
+sub fg {
+    my ($self, $service, $nlines) = @_;
 
-before [qw/start stop restart/] => sub {
-	$_[2]->{args} = [$_[0]->_expand_wildcards(@{$_[2]->{args}})];
-};
+    $nlines ||= 10;
 
-before signal => sub {
-	my ($signal, @svcs) = @{$_[2]->{args}};
-	$_[2]->{args} = [$signal, $_[0]->_expand_wildcards(@svcs)];
-};
-
-around 'status' => sub {
-	my ($orig, $self) = (shift, shift);
-	$self->_set_statuses($orig->($self, @_));
-	return $self->statuses;
-};
-
-=head1 METHODS
-
-=head2 run_cmd( $cmd, [ @args ] )
-
-Runs a shell command with zero or more arguments and returns its
-output. If the C<bindir> attribute is set, and the C<$cmd> is one
-of the supervision suite's library of tools, C<$cmd> will be prefixed
-with C<bindir>.
-
-=cut
-
-sub run_cmd {
-	my ($self, $cmd, @args) = @_;
-
-	my $options = {};
-
-	$cmd = $self->bindir . '/' . $cmd
-		if $self->bindir && $cmd =~ m/^(perp|s6|sv)/;
-
-	if (scalar @args && ref $args[-1]) {
-		$options = pop @args;
-	}
-
-	if ($options->{as_system}) {
-		system($cmd, @args);
-	} else {
-		$cmd = join(' ', $cmd, @args);
-		return qx/$cmd 2>&1/;
-	}
-}
-
-=head2 find_logfile( $pid )
-
-Finds the log file into which a logging program is currently
-writing to. C<$pid> is the process ID of the logging program.
-Currently, C<tinylog>, C<s6-log>, C<svlogd> and C<multilog>
-are supported.
-
-Returns C<undef> if the file is not found.
-
-=cut
-
-sub find_logfile {
-	my ($self, $pid) = @_;
+    my $logger_pid = $self->_call_suite_method('getting logger PID', 'get_logger_pid', $self->basedir, $service);
 
 	my $exe = readlink("/proc/$pid/exe")
-		|| return;
+		|| confess "Can't tell which logger is used";
 
 	my $file;
 
@@ -206,51 +214,49 @@ sub find_logfile {
 		closedir $dir;
 	}
 
-	return $file;
+    if (!$file) {
+        confess "Failed finding log file";
+    }
+
+    my $fh = IO::File->new($file, 'r')
+        || confess "Failed openning log file $file: $!";
+
+    my @last_lines;
+    while (defined(my $line = $fh->getline)) {
+        push(@last_lines, $line);
+        shift @last_lines if scalar @last_lines > $nlines;
+    }
+    print @last_lines;
+
+    while (1) {
+        while (defined(my $line = $fh->getline)) {
+            print $line;
+        }
+
+        sleep(1);
+    }
 }
 
-######################################################################
-# _expand_wildcards( @services )
-# goes over a list of services, possibly (but not necessarily)
-# with wildcards, and returns a new list with all services
-# that match. For example, if @services = ('sv1', 'sv2', 'worker*'),
-# and the services worker-1 and worker-2 exist, then the
-# method will return ('sv1', 'sv2', 'worker-1', 'worker-2')
-######################################################################
+=head2 rescan()
 
-sub _expand_wildcards {
-	my $self = shift;
+Causes the supervisor to rescan the service directory to find new or removed
+services. Not all supervisor suites support this method.
 
-	my %services;
-	foreach (@_) {
-		if (m/\*/) {
-			# this is a wildcard, find all services that match it
-			my $regex = $_; $regex =~ s/\*/.*/; $regex = qr/^$regex$/;
-			foreach my $sv (grep { m/$regex/ } keys %{$self->statuses}) {
-				$services{$sv} = 1;
-			}
-		} else {
-			$services{$_} = 1;
-		}
-	}
+=cut
 
-	return keys %services;
+sub rescan {
+    $self->_call_suite_method('rescanning', 'rescan');
 }
 
-#########################################################
-# _service_dirs()
-# returns a list of all service directories inside the
-# base directory
-#########################################################
+=head2 terminate()
 
-sub _service_dirs {
-	my $basedir = shift->basedir;
+Terminates the supervisor. Should also terminate all running services. Not all
+supervisor suites support this method.
 
-	opendir(my $dh, $basedir);
-	my @dirs = grep { !/^\./ && -d "$basedir/$_" } readdir $dh;
-	closedir $dh;
+=cut
 
-	return sort @dirs;
+sub terminate {
+    $self->_call_suite_method('terminating', 'terminate');
 }
 
 =head1 BUGS AND LIMITATIONS

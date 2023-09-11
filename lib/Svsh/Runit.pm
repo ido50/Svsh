@@ -1,13 +1,10 @@
 package Svsh::Runit;
 
-use Moo;
-use namespace::clean;
+use warnings;
+use strict;
 
-use Proc::Killall;
-
-our $DEFAULT_BASEDIR = -e '/etc/service' ? '/etc/service' : '/service';
-
-with 'Svsh';
+use Carp;
+use IPC::Cmd qw/run/;
 
 =head1 NAME
 
@@ -31,14 +28,29 @@ to C<svsh>.
 Refer to L<Svsh> for complete explanation of these methods. Only changes from
 the base specifications are listed here.
 
+=cut
+
+sub default_basedir { -e '/etc/service' ? '/etc/service' : '/service' }
+
 =head2 status()
 
 =cut
 
 sub status {
+    my ($basedir, @service_dirs) = @_;
+
 	my $statuses = {};
-	foreach ($_[0]->_service_dirs) {
-		my $raw = $_[0]->run_cmd('sv', 'status', $_[0]->basedir.'/'.$_);
+
+	foreach (@service_dirs) {
+        my ($ok, $err, $output, $stdout) = run(
+            command => ['sv', 'status', $basedir.'/'.$_]
+        );
+
+        if (!$ok) {
+            confess "sv failed: $err";
+        }
+
+        my $raw = join("", @$stdout);
 
 		my ($status, $pid, $duration) = $raw =~ m/^([^:]+):[^:]+:(?: \(pid (\d+)\))? (\d+)s/;
 
@@ -59,7 +71,9 @@ sub status {
 =cut
 
 sub start {
-	$_[0]->run_cmd('sv', 'up', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['sv', 'up', map { $basedir.'/'.$_ } @services];
 }
 
 =head stop( @services )
@@ -67,7 +81,9 @@ sub start {
 =cut
 
 sub stop {
-	$_[0]->run_cmd('sv', 'down', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['sv', 'down', map { $basedir.'/'.$_ } @services];
 }
 
 =head restart( @services )
@@ -75,7 +91,9 @@ sub stop {
 =cut
 
 sub restart {
-	$_[0]->run_cmd('sv', 'quit', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['sv', 'quit', map { $basedir.'/'.$_ } @services];
 }
 
 =head signal( $signal, @services )
@@ -83,45 +101,43 @@ sub restart {
 =cut
 
 sub signal {
-	my ($sign, @sv) = @{$_[2]->{args}};
+	my ($basedir, $signal, @services) = @_;
 
 	# convert signal to perpctl command
-	$sign =~ s/^sig//i;
-	if ($sign =~ m/^usr(1|2)$/) {
-		$sign = $1;
-	} elsif ($sign eq 'alrm') {
-		$sign = 'alarm';
-	} elsif ($sign eq 'int') {
-		$sign = 'interrupt';
+	$signal =~ s/^sig//i;
+	if ($signal =~ m/^usr(1|2)$/) {
+		$signal = $1;
+	} elsif ($signal eq 'alrm') {
+		$signal = 'alarm';
+	} elsif ($signal eq 'int') {
+		$signal = 'interrupt';
 	}
 
-	$_[0]->run_cmd('sv', lc($sign), map { $_[0]->basedir.'/'.$_ } @sv);
+	return ['sv', lc($signal), map { $basedir.'/'.$_ } @services];
 }
 
 =head2 fg( $service )
 
 =cut
 
-sub fg {
+sub get_logger_pid {
+    my ($basedir, $service) = @_;
+
 	# find out the pid of the logging process
-	my $text = $_[0]->run_cmd('sv', 'status', $_[0]->basedir.'/'.$_[2]->{args}->[0]);
+    my ($ok, $err, $output, $stdout) = run(
+        command => ['sv', 'status', $basedir.'/'.$service]
+    );
+
+    if (!$ok) {
+        confess "sv failed: $err";
+    }
+
+    my $text = join("", @$stdout);
+
 	my $pid = ($text =~ m/log: \(pid (\d+)\)/)[0]
-		|| die "Can't figure out pid of the logging process";
+		|| confess "regex did not match";
 
-	# find out the current log file
-	my $logfile = $_[0]->find_logfile($pid)
-		|| die "Can't find out process' log file";
-
-	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
-}
-
-=head2 terminate()
-
-=cut
-
-sub terminate {
-	my $basedir = $_[0]->basedir;
-	killall('HUP', "runsvdir $basedir");
+    return $pid;
 }
 
 =head1 BUGS AND LIMITATIONS

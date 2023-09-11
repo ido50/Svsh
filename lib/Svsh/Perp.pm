@@ -1,11 +1,10 @@
 package Svsh::Perp;
 
-use Moo;
-use namespace::clean;
+use warnings;
+use strict;
 
-our $DEFAULT_BASEDIR = $ENV{PERP_BASE} || '/etc/perp';
-
-with 'Svsh';
+use Carp;
+use IPC::Cmd qw/run/;
 
 =head1 NAME
 
@@ -28,6 +27,12 @@ a base directory is not provided to C<svsh>.
 Refer to L<Svsh> for complete explanation of these methods. Only changes from
 the base specifications are listed here.
 
+=cut
+
+sub default_basedir {
+    return $ENV{PERP_BASE} || '/etc/perp';
+}
+
 =head2 status()
 
 C<perp> provides more information about service statuses then
@@ -40,8 +45,19 @@ not necessarily).
 =cut
 
 sub status {
+    my ($basedir) = @_;
+
 	my $statuses = {};
-	foreach ($_[0]->run_cmd('perpls', '-b', $_[0]->basedir, '-g')) {
+
+    my ($ok, $err, $output, $stdout) = run(
+        command => ['perpls', '-b', $basedir, '-g']
+    );
+
+    if (!$ok) {
+        confess "perpls failed: $err";
+    }
+
+	foreach (@$stdout) {
 		chomp;
 		my @m = m/^
 			\[
@@ -86,7 +102,9 @@ L<stop()|/"stop( @services )"> why.
 =cut
 
 sub start {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'A', @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['perpctl', '-b', $basedir, 'A', @services];
 }
 
 =head stop( @services )
@@ -98,7 +116,9 @@ start again when the L<start()|/"start( @services )"> method is called.
 =cut
 
 sub stop {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'X', @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['perpctl', '-b', $basedir, 'X', @services];
 }
 
 =head restart( @services )
@@ -106,7 +126,9 @@ sub stop {
 =cut
 
 sub restart {
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, 'q', @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['perpctl', '-b', $basedir, 'q', @services];
 }
 
 =head2 signal( $signal, @services )
@@ -114,30 +136,37 @@ sub restart {
 =cut
 
 sub signal {
-	my ($sign, @sv) = @{$_[2]->{args}};
+	my ($basedir, $signal, @services) = @_;
 
 	# convert signal to perpctl command
-	$sign =~ s/^sig//i;
-	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
+	$signal =~ s/^sig//i;
+	my $cmd = $signal =~ m/^usr(1|2)$/i ? $1 : lc(substr($signal, 0, 1));
 
-	$_[0]->run_cmd('perpctl', '-b', $_[0]->basedir, $cmd, @sv);
+	return ['perpctl', '-b', $basedir, $cmd, @services];
 }
 
 =head2 fg( $service )
 
 =cut
 
-sub fg {
+sub get_logger_pid {
+    my ($basedir, $service) = @_;
+
 	# find out the pid of the logging process
-	my $text = $_[0]->run_cmd('perpstat', '-b', $_[0]->basedir, $_[2]->{args}->[0]);
+    my ($ok, $err, $output, $stdout) = run(
+        command => ['perpstat', '-b', $basedir, $service]
+    );
+
+    if (!$ok) {
+        confess "perpstat failed: $err";
+    }
+
+    my $text = join("", @$stdout);
+
 	my $pid = ($text =~ m/log:.+\(pid (\d+)\)/)[0]
-		|| die "Can't figure out pid of the logging process";
+		|| confess "regex did not match";
 
-	# find out the current log file
-	my $logfile = $_[0]->find_logfile($pid)
-		|| die "Can't find out process' log file";
-
-	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
+    return $pid;
 }
 
 =head2 rescan()
@@ -145,7 +174,9 @@ sub fg {
 =cut
 
 sub rescan {
-	$_[0]->run_cmd('perphup', $_[0]->basedir);
+    my $basedir = shift;
+
+    return ['perphup', $basedir];
 }
 
 =head2 terminate()
@@ -153,7 +184,9 @@ sub rescan {
 =cut
 
 sub terminate {
-	$_[0]->run_cmd('perphup', '-t', $_[0]->basedir);
+    my $basedir = shift;
+
+    return ['perphup', '-t', $basedir];
 }
 
 =head1 BUGS AND LIMITATIONS

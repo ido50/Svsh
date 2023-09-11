@@ -1,11 +1,10 @@
 package Svsh::Daemontools;
 
-use Moo;
-use namespace::clean;
+use warnings;
+use strict;
 
-our $DEFAULT_BASEDIR = '/service';
-
-with 'Svsh';
+use Carp;
+use IPC::Cmd qw/run/;
 
 =head1 NAME
 
@@ -26,14 +25,29 @@ is not provided to C<svsh>, that is what will be used.
 Refer to L<Svsh> for complete explanation of these methods. Only changes from
 the base specifications are listed here.
 
+=cut
+
+sub default_basedir {
+    return '/service';
+}
+
 =head2 status()
 
 =cut
 
 sub status {
+    my ($basedir, @service_dirs) = @_;
+
 	my $statuses = {};
-	foreach ($_[0]->_service_dirs) {
-		my $raw = $_[0]->run_cmd('svstat', $_[0]->basedir.'/'.$_);
+
+	foreach (@service_dirs) {
+        my ( $ok, $err, $output ) = run( command => ['svstat', $basedir.'/'.$_] );
+
+        if (!$ok) {
+            confess "svstat failed: $err";
+        }
+
+        my $raw = join("", @$output);
 
 		my ($status, $pid, $duration) = $raw =~ m/$_: (\w+)(?: \(pid (\d+)\))? (\d+) seconds/;
 
@@ -43,6 +57,7 @@ sub status {
 			pid => $pid || '-'
 		};
 	}
+
 	return $statuses;
 }
 
@@ -51,7 +66,9 @@ sub status {
 =cut
 
 sub start {
-	$_[0]->run_cmd('svc', '-u', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+    return ['svc', '-u', map { $basedir.'/'.$_ } @services];
 }
 
 =head2 stop( @services )
@@ -59,7 +76,9 @@ sub start {
 =cut
 
 sub stop {
-	$_[0]->run_cmd('svc', '-d', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['svc', '-d', map { $basedir.'/'.$_ } @services];
 }
 
 =head2 restart( @services )
@@ -71,7 +90,9 @@ C<QUIT> signal. Future versions might reimplement this with perl's C<kill> funct
 =cut
 
 sub restart {
-	$_[0]->run_cmd('svc', '-t', map { $_[0]->basedir.'/'.$_ } @{$_[2]->{args}});
+    my ($basedir, @services) = @_;
+
+	return ['svc', '-t', map { $basedir.'/'.$_ } @services];
 }
 
 =head2 signal( $signal, @services )
@@ -81,44 +102,45 @@ C<USR1>, C<USR2>, C<QUIT> and C<WINCH> are not supported by C<daemontools>.
 =cut
 
 sub signal {
-	my ($sign, @sv) = @{$_[2]->{args}};
+    my ($basedir, $signal, @services) = @_;
 
 	# convert signal to perpctl command
-	$sign =~ s/^sig//i;
-	die "daemontools does not support the $sign signal"
-		if lc($sign) =~ m/^(usr\d|quit|winch)$/;
+	$signal =~ s/^sig//i;
+	die "daemontools does not support the $signal signal"
+		if lc($signal) =~ m/^(usr\d|quit|winch)$/;
 
-	$_[0]->run_cmd('svc', '-'.lc(substr($sign, 0, 1)), map { $_[0]->basedir.'/'.$_ } @sv);
+	return ['svc', '-'.lc(substr($signal, 0, 1)), map { $basedir.'/'.$_ } @services];
 }
 
-=head2 fg( $service )
+=head2 get_logger_pid( $basedir, $service )
 
 =cut
 
-sub fg {
+sub get_logger_pid {
+    my ($basedir, $service) = @_;
+
 	# find out the pid of the logging process
-	my $text = $_[0]->run_cmd('svstat', $_[0]->basedir.'/'.$_[2]->{args}->[0].'/log');
+	my ($ok, $err, $output, $stdout) = run(command => ['svstat', $basedir.'/'.$service.'/log']);
+
+    if (!$ok) {
+        confess "svstat failed: $err";
+    }
+
+    my $text = join("", @$stdout);
+
 	my $pid = ($text =~ m/up \(pid (\d+)\)/)[0]
-		|| die "Can't figure out pid of the logging process";
+		|| confess "regex did not match";
 
-	# find out the current log file
-	my $logfile = $_[0]->find_logfile($pid)
-		|| die "Can't find out process' log file";
-
-	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
+    return $pid;
 }
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to
-L<https://github.com/ido50/Svsh/issues>.
+Please report any bugs or feature requests to L<https://github.com/ido50/Svsh/issues>.
 
 =head1 AUTHOR
 
 Ido Perlmuter <ido@ido50.net>
-
-Thanks to the guys at the L<supervision mailing list|http://skarnet.org/lists.html#supervision>,
-especially Colin Booth, for helping out with suggestions and information.
 
 =head1 LICENSE AND COPYRIGHT
 

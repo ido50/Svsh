@@ -1,6 +1,8 @@
 Revision history for Svsh
 
 {{$NEXT}}
+
+1.003000  2023-09-11 16:35:55+03:00 Asia/Jerusalem
     - Replace Getopt::Compact with core module Getopt::Long
     - Switch license to Apache 2.0
 

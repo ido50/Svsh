@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
+
 BEGIN {
 	binmode STDOUT, ':encoding(utf8)';
 }
@@ -12,6 +14,7 @@ our $VERSION = "1.003000";
 $VERSION = eval $VERSION;
 
 use Getopt::Long qw/:config no_ignore_case no_auto_abbrev pass_through/;
+use Svsh;
 use Term::ANSIColor qw/:constants/;
 use Term::ShellUI;
 use Pod::Usage;
@@ -22,13 +25,12 @@ svsh - Process supervision shell for daemontools/perp/s6/runit
 
 =head1 SYNOPSIS
 
-svsh [OPTIONS]
+ svsh [OPTIONS]
 
 Options:
 
   --basedir=BASEDIR (-d)   Service directory (on which supervisor was started).
   --suite=SUITE     (-s)   Supervision suite managing the directory (perp, s6 or runit).
-  --bindir=BINDIR   (-b)   Directory where the supervisor is installed (e.g. /usr/sbin). Optional.
   --collapse        (-c)   Collapse numbered services into one line.
 
 Example:
@@ -77,11 +79,6 @@ the C<SVSH_BASE> environment variable will be checked, and if not set, the defau
 base directory of the selected suite will be used. Check the documentation of
 the specific suite class for its default directory. If no directory is found,
 an error will be raised.
-
-=head2 -b, --bindir
-
-If the supervision suite's tools are not in the environment C<PATH> variable,
-you can provide the directory where they are located (e.g. C</usr/local/bin>).
 
 =head2 -c, --collapse
 
@@ -260,12 +257,11 @@ Hopefully, future versions will find a more generic way of identifying multi-pro
 
 =cut
 
-my ($basedir, $suite, $bindir, $collapse, $help, $man);
+my ($basedir, $suite, $collapse, $help, $man);
 
 GetOptions(
-    'basedir|d=s' => \$basedir,
     'suite|s=s' => \$suite,
-    'bindir|b:s' => \$bindir,
+    'basedir|d=s' => \$basedir,
     'collapse|c' => \$collapse,
     'help|h' => \$help,
     'man' => \$man
@@ -273,33 +269,12 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;
 
-# if a suite is not provided, check the SVSH_SUITE environment
-# variable
 $suite ||= $ENV{SVSH_SUITE};
+$basedir ||= $ENV{SVSH_BASE};
 
-# check the selected suite is valid
-_check_suite($suite);
-
-# load the adapter class for the suite
-my $class = 'Svsh::'.ucfirst($suite);
-eval "require $class";
-die $@ if $@;
-
-# if a base directory was not defined, guess it
-{
-	no strict 'refs';
-	$basedir ||= $ENV{SVSH_BASE} || ${"${class}::DEFAULT_BASEDIR"};
-}
-
-# make sure the base directory exists
-_check_basedir($basedir);
-
-# create a new instance of the adapter class
-my $svsh = $class->new(
-    basedir => $basedir,
-    bindir => $bindir,
-    collapse => $collapse
-);
+my $svsh = Svsh->new($suite, $basedir, {
+    collapse => $collapse,
+});
 
 # configure the shell
 my $term = Term::ShellUI->new(
@@ -463,33 +438,6 @@ sub _signal_grep {
 	}
 }
 
-sub _check_suite {
-	my $suite = shift;
-
-	$suite
-		|| _error('Suite not provided');
-	$suite =~ m/^(perp|s6|runit|daemontools)$/
-		|| _error('Suite must be perp, s6, runit or daemontools');
-}
-
-sub _check_basedir {
-	my $basedir = shift;
-
-	$basedir
-		|| _error('Base directory not provided');
-	-e $basedir && -d $basedir
-		|| _error("Base directory $basedir does not exist or is not a directory");
-
-	print "Base directory: $basedir\n"
-		if $ENV{SVSH_VERBOSE};
-}
-
-sub _error {
-	my $msg = shift;
-
-    pod2usage(-exitval => 1, -msg => "ERROR: $msg\n");
-}
-
 =head1 CONFIGURATION AND ENVIRONMENT
 
 C<svsh> requires no configuration files or environment variables.
@@ -499,10 +447,6 @@ C<svsh> requires no configuration files or environment variables.
 C<svsh> depends on the following modules:
 
 =over
-
-=item * L<Moo>
-
-=item * L<namespace::clean>
 
 =item * L<Proc::Killall>
 

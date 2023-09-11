@@ -1,11 +1,10 @@
 package Svsh::S6;
 
-use Moo;
-use namespace::clean;
+use warnings;
+use strict;
 
-our $DEFAULT_BASEDIR = '/service';
-
-with 'Svsh';
+use Carp;
+use IPC::Cmd qw/run/;
 
 =head1 NAME
 
@@ -26,14 +25,30 @@ so that is what will be used if a base directory was not provided to C<svsh>.
 Refer to L<Svsh> for complete explanation of these methods. Only changes from
 the base specifications are listed here.
 
+=cut
+
+sub default_basedir { '/service' }
+
 =head2 status()
 
 =cut
 
 sub status {
+    my ($basedir, @service_dirs) = @_;
+
 	my $statuses = {};
-	foreach ($_[0]->_service_dirs) {
-		my $raw = $_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_);
+
+	foreach (@service_dirs) {
+        my ($ok, $err, $output, $stdout) = run(
+            command => ['s6-svstat', $basedir.'/'.$_]
+        );
+
+        if (!$ok) {
+            confess "s6-svstat failed: $err";
+        }
+
+        my $raw = join("", @$stdout);
+
 		my ($status, $comment, $seconds) = ($raw =~ m/(up|down) \(([^\)]+)\) (\d+)/);
 		$statuses->{$_} = {
 			status => $status,
@@ -45,7 +60,22 @@ sub status {
 			$statuses->{$_}->{pid} = $1;
 		}
 	}
+
 	return $statuses;
+}
+
+sub _run_svc {
+    my ($flags, $service_dir) = @_;
+
+    my ($ok, $err, $output, $stdout) = run(
+        command => ['s6-svc', $flags, $service_dir]
+    );
+
+    if (!$ok) {
+        confess "s6-svc failed: $err";
+    }
+
+    return join("", @$stdout);
 }
 
 =head2 start( @services )
@@ -53,8 +83,10 @@ sub status {
 =cut
 
 sub start {
-	foreach (@{$_[2]->{args}}) {
-		$_[0]->run_cmd('s6-svc', '-u', $_[0]->basedir.'/'.$_);
+    my ($basedir, @services) = @_;
+
+    foreach (@services) {
+        _run_svc('-u', $basedir.'/'.$_);
 	}
 }
 
@@ -63,8 +95,10 @@ sub start {
 =cut
 
 sub stop {
-	foreach (@{$_[2]->{args}}) {
-		$_[0]->run_cmd('s6-svc', '-Dd', $_[0]->basedir.'/'.$_);
+    my ($basedir, @services) = @_;
+
+    foreach (@services) {
+        _run_svc('-Dd', $basedir.'/'.$_);
 	}
 }
 
@@ -73,8 +107,10 @@ sub stop {
 =cut
 
 sub restart {
-	foreach (@{$_[2]->{args}}) {
-		$_[0]->run_cmd('s6-svc', '-q', $_[0]->basedir.'/'.$_);
+    my ($basedir, @services) = @_;
+
+    foreach (@services) {
+        _run_svc('-q', $basedir.'/'.$_);
 	}
 }
 
@@ -83,32 +119,39 @@ sub restart {
 =cut
 
 sub signal {
-	my ($sign, @sv) = @{$_[2]->{args}};
+    my ($basedir, $signal, @services) = @_;
 
 	# convert signal to perpctl command
-	$sign =~ s/^sig//i;
-	my $cmd = $sign =~ m/^usr(1|2)$/i ? $1 : lc(substr($sign, 0, 1));
+	$signal =~ s/^sig//i;
+	my $cmd = $signal =~ m/^usr(1|2)$/i ? $1 : lc(substr($signal, 0, 1));
 
-	foreach (@sv) {
-		$_[0]->run_cmd('s6-svc', "-$cmd", $_[0]->basedir.'/'.$_);
+	foreach (@services) {
+        _run_svc("-$cmd", $basedir.'/'.$_);
 	}
 }
 
-=head2 fg( $service )
+=head2 get_logger_pid( $service )
 
 =cut
 
-sub fg {
+sub get_logger_pid {
+    my ($basedir, $service) = @_;
+
 	# find out the pid of the logging process
-	my $text = $_[0]->run_cmd('s6-svstat', $_[0]->basedir.'/'.$_[2]->{args}->[0].'/log');
+    my ($ok, $err, $output, $stdout) = run(
+        command => ['s6-svstat', $basedir.'/'.service.'/log']
+    );
+
+    if (!$ok) {
+        confess "s6-svstat failed: $err";
+    }
+
+    my $text = join("", @$stdout);
+
 	my $pid = ($text =~ m/\(pid (\d+)\)/)[0]
-		|| die "Can't figure out pid of the logging process";
+		|| confess "regex did not match";
 
-	# find out the current log file
-	my $logfile = $_[0]->find_logfile($pid)
-		|| die "Can't find out process' log file";
-
-	$_[0]->run_cmd('tail', '-f', $logfile, { as_system => 1 });
+    return $pid;
 }
 
 =head2 rescan()
@@ -116,7 +159,9 @@ sub fg {
 =cut
 
 sub rescan {
-	$_[0]->run_cmd('s6-svscanctl', '-a', $_[0]->basedir);
+    my $basedir = shift;
+
+    return ['s6-svscanctl', '-a', $basedir];
 }
 
 =head2 terminate()
@@ -124,7 +169,9 @@ sub rescan {
 =cut
 
 sub terminate {
-	$_[0]->run_cmd('s6-svscanctl', '-t', $_[0]->basedir);
+    my $basedir = shift;
+
+    return ['s6-svscanctl', '-t', $basedir];
 }
 
 =head1 BUGS AND LIMITATIONS
