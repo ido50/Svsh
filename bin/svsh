@@ -8,7 +8,7 @@ use lib 'lib';
 use warnings;
 use strict;
 
-our $VERSION = "1.003000";
+our $VERSION = "1.003001";
 $VERSION = eval $VERSION;
 
 use Getopt::Long qw/:config no_ignore_case no_auto_abbrev pass_through/;
@@ -216,18 +216,18 @@ C<stop worker*>. Wildcards are also supported at the beginning of the name, so
 C<signal term *d> will send a C<TERM> signal to all services whose names end with "d".
 
 	svsh> status
-	   process |     status | duration |   pid
-	  worker-1 |         up |    9813s | 25984
-	  worker-2 |         up |    9813s | 25976
-	  worker-3 |         up |    4393s | 2990
+	  process  | status | duration | pid
+	  worker-1 | up     | 9813s    | 25984
+	  worker-2 | up     | 9813s    | 25976
+	  worker-3 | up     | 4393s    | 2990
 
 	svsh> stop worker*
 
 	svsh> status
-	   process |     status | duration |   pid
-	  worker-1 |       down |       2s |     -
-	  worker-2 |       down |       2s |     -
-	  worker-3 |       down |       2s |     -
+	  process  | status | duration | pid
+	  worker-1 | down   | 2s       | -
+	  worker-2 | down   | 2s       | -
+	  worker-3 | down   | 2s       | -
 
 =head2 COLLAPSE
 
@@ -245,14 +245,14 @@ If the L<collapse|/"-c, --collapse"> option is on, C<svsh> will collapse all of 
 just one line, under the name C<status>.
 
 	svsh> status
-	   process |     status | duration |   pid
-	  worker-1 |         up |    9813s | 25984
-	  worker-2 |         up |    9813s | 25976
-	  worker-3 |         up |    4393s | 2990
+	  process  | status     | duration | pid
+	  worker-1 | up         | 9813s    | 25984
+	  worker-2 | up         | 9813s    | 25976
+	  worker-3 | up         | 4393s    | 2990
 
 	svsh> toggle collapse
-	   process |     status | duration |   pid
-	    worker |       3 up |    9850s |     -
+	  process | status | duration | pid
+	  worker  | 3 up   | 9850s    | -
 
 This feature combines well with the L</"WILDCARDS"> feature.
 
@@ -334,19 +334,19 @@ my $term = Term::ShellUI->new(
 
 				print BOLD BLACK ON_WHITE
 					join(' | ',
-						sprintf('%16s', 'process'),
-						sprintf('%10s',  'status'),
-						sprintf('%8s', 'duration'),
-						sprintf('%5s',      'pid')
+						sprintf('%-26s', 'process'),
+						sprintf('%-12s',  'status'),
+						sprintf('%-10s', 'duration'),
+						sprintf('%-8s',      'pid')
 					), ' ', RESET, "\n";
 				foreach (sort keys %statuses) {
 					my $s = $statuses{$_};
 					my $color = $s->{status} =~ m/^(\d+ )?up$/ ? GREEN :
 							$s->{status} eq 'resetting' ? YELLOW : RED;
-					print BOLD sprintf('%16s', $_), RESET, ' | ',
-						$color, sprintf('%10s', $s->{status}), RESET, ' | ',
-						sprintf('%8s', $s->{duration}.'s'), ' | ',
-						sprintf('%5s', $s->{pid}), " \n";
+					print BOLD sprintf('%-26s', $_), RESET, ' | ',
+						$color, sprintf('%-12s', $s->{status}), RESET, ' | ',
+						sprintf('%-10s', $s->{duration}.'s'), ' | ',
+						sprintf('%-8s', $s->{pid}), " \n";
 				}
 				print "\n";
 			}

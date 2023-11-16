@@ -1,22 +1,25 @@
 Revision history for Svsh
 
 {{$NEXT}}
+    - Increase width of columns in status table, align contents to the left.
+
+1.003000  2023-09-11 16:35:55+03:00 Asia/Jerusalem
     - Replace Getopt::Compact with core module Getopt::Long
     - Switch license to Apache 2.0
 
 1.002000  2015-08-13 21:16:42+03:00 Asia/Jerusalem
-	- The --suite and --basedir options are no longer required. If --suite
-	  does not exist, the SVSH_SUITE environment variable is checked. If --basedir
-	  does not exist, the SVSH_BASE environment variable is checked, and if not,
-	  the default directory for the specific suite is used (see the suite's class
-	  for its default directory).
+    - The --suite and --basedir options are no longer required. If --suite
+      does not exist, the SVSH_SUITE environment variable is checked. If --basedir
+      does not exist, the SVSH_BASE environment variable is checked, and if not,
+      the default directory for the specific suite is used (see the suite's class
+      for its default directory).
 
 1.001000  2015-08-06 22:21:11+03:00 Asia/Jerusalem
-	- Add history_file usage for bash-like history
-	- Add autocompletion to all argument taking commands
-	- Add Term::ReadLine::Gnu recommendation (for better history/autocomplete)
-	- Use s6-svscanctl -t instead of -7 to terminate s6-svscan
-	- Implement terminate for runit (requires Process::Killall)
+    - Add history_file usage for bash-like history
+    - Add autocompletion to all argument taking commands
+    - Add Term::ReadLine::Gnu recommendation (for better history/autocomplete)
+    - Use s6-svscanctl -t instead of -7 to terminate s6-svscan
+    - Implement terminate for runit (requires Process::Killall)
 
 1.000000  2015-08-04 00:20:24+03:00 Asia/Jerusalem
-	- First public release
+    - First public release

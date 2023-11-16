@@ -2,7 +2,7 @@ package Svsh;
 
 # ABSTRACT: Process supervision shell for daemontools/perp/s6/runit
 
-our $VERSION = "1.003000";
+our $VERSION = "1.003001";
 $VERSION = eval $VERSION;
 
 use Moo::Role;
