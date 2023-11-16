@@ -2,6 +2,7 @@ Revision history for Svsh
 
 {{$NEXT}}
     - Increase width of columns in status table, align contents to the left.
+    - Add the `stt` command as an alias to `status`.
 
 1.003000  2023-09-11 16:35:55+03:00 Asia/Jerusalem
     - Replace Getopt::Compact with core module Getopt::Long

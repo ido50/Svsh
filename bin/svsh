@@ -95,6 +95,8 @@ support all commands.
 
 =head2 status
 
+I<Alias: stt>.
+
 Prints a list of all services, their statuses (up, down, etc.), uptimes (or
 downtimes) and process IDs. This command is automatically executed upon
 initialization of the shell.
@@ -351,6 +353,7 @@ my $term = Term::ShellUI->new(
 				print "\n";
 			}
 		},
+        stt => { alias => 'status' },
 		toggle => {
 			desc => 'Toggle svsh switches (e.g. collapse)',
 			minargs => 1,
